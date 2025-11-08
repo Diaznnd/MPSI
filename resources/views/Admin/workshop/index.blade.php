@@ -26,30 +26,98 @@
             </div>
         </div>
 
-    {{-- Add Workshop --}}
-    <div class="mb-6">
-      <a href="{{ route('admin.workshop.create') }}"
-         class="bg-[#068B4B] hover:bg-[#08AA5C] text-white px-6 py-3 rounded-lg text-sm font-medium inline-flex items-center">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-        </svg>
-        Tambah Workshop
-      </a>
-    </div>
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Total Workshop Card -->
+            <div class="bg-white rounded-lg shadow-sm  p-6 relative">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-medium text-gray-600">Total Workshop</h3>
+                    <button class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="mb-2">
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['total_workshop']['value'] }}</p>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-sm font-medium {{ $stats['total_workshop']['is_positive'] ? 'text-green-600' : 'text-red-600' }}">
+                        ↑ {{ $stats['total_workshop']['change'] }}%
+                    </span>
+                    <span class="ml-2 text-xs text-gray-500">Last 7 days</span>
+                </div>
+            </div>
 
-    {{-- Search Bar --}}
-    <div class="rounded-lg p-3 mb-2">
-      <form method="GET" action="{{ route('admin.workshop.index') }}" class="relative max-w-md ml-auto">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-          </svg>
+            <!-- Workshop Aktif Card -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 relative">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-medium text-gray-600">Workshop Aktif</h3>
+                    <button class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="mb-2">
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['workshop_aktif']['value'] }}</p>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-sm font-medium text-green-600">
+                        Aktif
+                    </span>
+                    <span class="ml-2 text-xs text-gray-500">Status</span>
+                </div>
+            </div>
+
+            <!-- Workshop Nonaktif Card -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 relative">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-medium text-gray-600">Workshop Nonaktif</h3>
+                    <button class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="mb-2">
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['workshop_nonaktif']['value'] }}</p>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-sm font-medium text-gray-600">
+                        Nonaktif
+                    </span>
+                    <span class="ml-2 text-xs text-gray-500">Status</span>
+                </div>
+            </div>
         </div>
-        <input type="text" name="q" value="{{ request('q') }}"
-               class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-               placeholder="Cari Workshop Disini"
-               id="searchWorkshop">
-      </form>
+
+    {{-- Add Workshop --}}
+    <div class="mt-6 flex justify-between items-center">
+      <div class="mb-6">
+        <a href="{{ route('admin.workshop.create') }}"
+          class="bg-[#068B4B] hover:bg-[#08AA5C] text-white px-6 py-3 rounded-lg text-sm font-medium inline-flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Tambah Workshop
+        </a>
+      </div>
+
+      {{-- Search Bar --}}
+      <div class="rounded-lg p-3 mb-2">
+        <form method="GET" action="{{ route('admin.workshop.index') }}" class="relative max-w-md ml-auto">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <input type="text" name="q" value="{{ request('q') }}"
+                class="block w-full pl-10 pr-29 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Cari Workshop Disini"
+                id="searchWorkshop">
+        </form>
+      </div>
     </div>
 
     {{-- Grid --}}

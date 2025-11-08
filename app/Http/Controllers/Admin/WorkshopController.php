@@ -61,9 +61,62 @@ class WorkshopController extends Controller
         // Replace collection di paginator supaya {{ $workshops->links() }} tetap bisa dipakai
         $paginator->setCollection($workshops);
 
+        // Hitung statistik
+        $stats = $this->calculateStatistics();
+
         return view('admin.workshop.index', [
-            'workshops' => $paginator
+            'workshops' => $paginator,
+            'stats' => $stats
         ]);
+    }
+
+    /**
+     * Hitung statistik workshop
+     */
+    private function calculateStatistics()
+    {
+        // Total workshop
+        $totalWorkshop = Workshop::count();
+    
+        // Workshop aktif
+        $workshopAktif = Workshop::where('status_workshop', 'aktif')->count();
+        
+        // Workshop nonaktif
+        $workshopNonaktif = Workshop::where('status_workshop', 'nonaktif')
+            ->orWhereNull('status_workshop')
+            ->count();
+
+        // Hitung perubahan 7 hari terakhir (untuk total workshop)
+        $last7Days = Workshop::where('tanggal', '>=', Carbon::now()->subDays(7))->count();
+        $previous7Days = Workshop::whereBetween('tanggal', [
+            Carbon::now()->subDays(14),
+            Carbon::now()->subDays(7)
+        ])->count();
+
+        $percentageChange = 0;
+        if ($previous7Days > 0) {
+            $percentageChange = (($last7Days - $previous7Days) / $previous7Days) * 100;
+        } elseif ($last7Days > 0) {
+            $percentageChange = 100;
+        }
+
+        return [
+            'total_workshop' => [
+                'value' => $totalWorkshop,
+                'change' => number_format($percentageChange, 1),
+                'is_positive' => $percentageChange >= 0
+            ],
+            'workshop_aktif' => [
+                'value' => $workshopAktif,
+                'change' => '0.0', // Bisa ditambahkan logika perhitungan jika diperlukan
+                'is_positive' => true
+            ],
+            'workshop_nonaktif' => [
+                'value' => $workshopNonaktif,
+                'change' => '0.0', // Bisa ditambahkan logika perhitungan jika diperlukan
+                'is_positive' => false
+            ]
+        ];
     }
 
     public function create()
@@ -85,14 +138,14 @@ class WorkshopController extends Controller
             'kuota' => 'required|integer|min:1',
             'kuota_terisi' => 'nullable|integer|min:0',
             'sampul_poster_url' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048',
-            'status_workshop' => 'nullable|string|in:aktif,selesai,ditunda', // Sesuaikan status
+            'status_workshop' => 'nullable|string|in:aktif,nonaktif', // Sesuaikan status
             'keywords' => 'nullable|array',  // Validasi untuk keywords
             'keywords.*' => 'nullable|string|max:255', // Validasi setiap keyword
         ], [
             'waktu.regex' => 'Format waktu harus HH:MM (contoh: 09:00 atau 15:30)',
         ]);
 
-        $validated['status_workshop'] = $validated['status_workshop'] ?? 'aktif';
+        $validated['status_workshop'] = $validated['status_workshop'] ?? 'nonaktif';
 
         // Cek apakah pemateri_id adalah user dengan role pemateri
         $pemateri = User::find($validated['pemateri_id']);
@@ -157,7 +210,7 @@ class WorkshopController extends Controller
             'kuota' => 'required|integer|min:1',
             'kuota_terisi' => 'nullable|integer|min:0',
             'sampul_poster_url' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048',
-            'status_workshop' => 'nullable|string|in:aktif,selesai,ditunda',
+            'status_workshop' => 'nullable|string|in:aktif,nonaktif',
             'keywords' => 'nullable|array',
             'keywords.*' => 'nullable|string|max:255',
             'remove_image' => 'nullable|boolean',
@@ -213,8 +266,57 @@ class WorkshopController extends Controller
             }
         }
 
+        // Cek kuota dan update status jika perlu
+        $this->checkAndUpdateQuotaStatus($workshop);
+
         return redirect()->route('admin.workshop.show', $workshop->workshop_id)
             ->with('success', 'Workshop berhasil diperbarui.');
+    }
+
+    public function updateStatus(Request $request, Workshop $workshop)
+    {
+        $validated = $request->validate([
+            'status_workshop' => 'required|in:aktif,nonaktif',
+        ]);
+
+        // Cek apakah kuota sudah penuh
+        $currentTerisi = $workshop->kuota_terisi !== null ? $workshop->kuota_terisi : $workshop->pendaftaran()->count();
+        $maxKuota = $workshop->kuota ?? 0;
+        
+        // Jika mencoba mengaktifkan workshop tapi kuota sudah penuh
+        if ($validated['status_workshop'] === 'aktif' && $maxKuota > 0 && $currentTerisi >= $maxKuota) {
+            return redirect()->route('admin.workshop.show', $workshop->workshop_id)
+                ->with('error', 'Tidak dapat mengaktifkan workshop karena kuota sudah penuh (' . $currentTerisi . '/' . $maxKuota . ').');
+        }
+
+        $workshop->status_workshop = $validated['status_workshop'];
+        $workshop->save();
+
+        // Cek ulang setelah update - jika kuota penuh, otomatis nonaktifkan
+        $this->checkAndUpdateQuotaStatus($workshop);
+
+        $statusMessages = [
+            'aktif' => 'Workshop telah diaktifkan',
+            'nonaktif' => 'Workshop telah dinonaktifkan',
+        ];
+
+        return redirect()->route('admin.workshop.show', $workshop->workshop_id)
+            ->with('success', $statusMessages[$validated['status_workshop']] ?? 'Status berhasil diperbarui.');
+    }
+
+    /**
+     * Cek apakah kuota sudah penuh dan otomatis nonaktifkan jika penuh
+     */
+    private function checkAndUpdateQuotaStatus(Workshop $workshop)
+    {
+        $currentTerisi = $workshop->kuota_terisi !== null ? $workshop->kuota_terisi : $workshop->pendaftaran()->count();
+        $maxKuota = $workshop->kuota ?? 0;
+        
+        // Jika kuota sudah penuh dan status masih aktif, ubah ke nonaktif
+        if ($maxKuota > 0 && $currentTerisi >= $maxKuota && $workshop->status_workshop === 'aktif') {
+            $workshop->status_workshop = 'nonaktif';
+            $workshop->save();
+        }
     }
 
     public function destroy(Workshop $workshop)

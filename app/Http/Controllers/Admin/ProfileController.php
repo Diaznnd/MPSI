@@ -13,6 +13,7 @@ class ProfileController extends Controller
 {
     public function index()
     {
+        /** @var User $user */
         $user = Auth::user();
         return view('Admin.profile.index', compact('user'));
     }
@@ -23,6 +24,7 @@ class ProfileController extends Controller
             'password' => 'required',
         ]);
 
+        /** @var User $user */
         $user = Auth::user();
 
         if (!Hash::check($request->password, $user->password)) {
@@ -45,6 +47,7 @@ class ProfileController extends Controller
                 ->with('error', 'Silakan verifikasi password terlebih dahulu untuk mengakses halaman edit.');
         }
 
+        /** @var User $user */
         $user = Auth::user();
         return view('Admin.profile.edit', compact('user'));
     }
@@ -59,6 +62,7 @@ class ProfileController extends Controller
                 ->with('error', 'Sesi verifikasi telah berakhir. Silakan verifikasi password kembali.');
         }
 
+        /** @var User $user */
         $user = Auth::user();
 
         $request->validate([
@@ -112,6 +116,7 @@ class ProfileController extends Controller
             'new_password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
         ]);
 
+        /** @var User $user */
         $user = Auth::user();
 
         // Verifikasi password saat ini

@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Informasi Workshop</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/LOGO UNAND.PNG') }}">
 
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -20,7 +21,7 @@
             <!-- Logo and Title -->
             <div class="flex items-center space-x-4 mb-8">
                 <img src="{{ asset('images/LOGO UNAND.png') }}" alt="Universitas Andalas" class="w-16 h-auto">
-                <div class="text-lg text-[#068b4b] font-bold leading-tight">
+                <div class="text-lg text-[#057A55] font-bold leading-tight">
                     Sistem Informasi Workshop
                 </div>
             </div>
@@ -49,7 +50,7 @@
                             hover:bg-[#068b4b] hover:text-white
                             @if(request()->routeIs('admin.workshop.index')) bg-gray-200 @endif">
                             <span>Workshop</span>
-                            @if(request()->routeIs('admin.workshops.index'))
+                            @if(request()->routeIs('admin.workshop.index'))
                                 <span class="w-2.5 h-2.5 bg-[#068b4b] rounded-full"></span>
                             @endif
                         </a>

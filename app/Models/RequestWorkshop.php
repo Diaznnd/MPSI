@@ -19,4 +19,10 @@ class RequestWorkshop extends Model
     protected $fillable = [
         'user_id', 'judul', 'deskripsi', 'status_request', 'tanggal_tanggapan', 'catatan_admin'
     ];
+
+    // Relasi dengan User
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
 }

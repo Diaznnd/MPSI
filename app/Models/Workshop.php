@@ -35,4 +35,28 @@ class Workshop extends Model
         return $this->hasMany(Pendaftaran::class, 'workshop_id', 'workshop_id');
     }
 
+    /**
+     * Cek apakah kuota sudah penuh
+     */
+    public function isQuotaFull()
+    {
+        $currentTerisi = $this->kuota_terisi !== null ? $this->kuota_terisi : $this->pendaftaran()->count();
+        $maxKuota = $this->kuota ?? 0;
+        
+        return $maxKuota > 0 && $currentTerisi >= $maxKuota;
+    }
+
+    /**
+     * Otomatis nonaktifkan jika kuota penuh
+     */
+    public function autoDeactivateIfQuotaFull()
+    {
+        if ($this->isQuotaFull() && $this->status_workshop === 'aktif') {
+            $this->status_workshop = 'nonaktif';
+            $this->save();
+            return true;
+        }
+        return false;
+    }
+
 }

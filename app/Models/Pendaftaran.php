@@ -33,5 +33,21 @@ class Pendaftaran extends Model
         return $this->belongsTo(Workshop::class, 'workshop_id', 'workshop_id');
     }
 
+    /**
+     * Boot method untuk menambahkan event listener
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Setelah pendaftaran dibuat, cek kuota dan nonaktifkan jika penuh
+        static::created(function ($pendaftaran) {
+            $workshop = $pendaftaran->workshop;
+            if ($workshop) {
+                $workshop->autoDeactivateIfQuotaFull();
+            }
+        });
+    }
+
 }
 

@@ -30,7 +30,7 @@
         <!-- Statistics Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <!-- Total Pengguna Card -->
-            <div class="bg-white rounded-lg shadow-sm border-2 border-blue-500 p-6 relative">
+            <div class="bg-white rounded-lg shadow-sm p-6 relative">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-medium text-gray-600">Total Pengguna</h3>
                     <button class="text-gray-400 hover:text-gray-600">

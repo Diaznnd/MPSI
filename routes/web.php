@@ -8,6 +8,7 @@ use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\Admin\WorkshopController;
 use App\Http\Controllers\Admin\PendaftaranController;
 use App\Http\Controllers\Admin\AccountController;
+use App\Http\Controllers\Admin\RequestWorkshopController;
 
 // Login Routes
 
@@ -34,7 +35,13 @@ Route::middleware(['auth'])
         Route::get('/workshops/{workshop}/pendaftar', [PendaftaranController::class, 'index'])->name('workshop.pendaftar');
         Route::get('/workshops/{workshop}/edit', [WorkshopController::class, 'edit'])->name('workshop.edit');
         Route::put('/workshops/{workshop}', [WorkshopController::class, 'update'])->name('workshop.update');
+        Route::put('/workshops/{workshop}/status', [WorkshopController::class, 'updateStatus'])->name('workshop.updateStatus');
         Route::delete('/workshops/{workshop}', [WorkshopController::class, 'destroy'])->name('workshop.destroy');
+        
+        // Request Workshop Management
+        Route::get('/request', [RequestWorkshopController::class, 'index'])->name('request.index');
+        Route::get('/request/{request_id}', [RequestWorkshopController::class, 'show'])->name('request.show');
+        Route::put('/request/{request_id}/status', [RequestWorkshopController::class, 'updateStatus'])->name('request.updateStatus');
         
         // Account Management
         Route::get('/account/manage', [AccountController::class, 'index'])->name('account.manage');

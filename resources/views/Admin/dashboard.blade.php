@@ -6,7 +6,7 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
     {{-- Judul dan breadcrumb --}}
     <div>
-      <h1 class="text-3xl font-bold text-[#068b4b] mb-1">
+      <h1 class="text-3xl font-bold text-[#000000] mb-1">
         Dashboard
       </h1>
       <p class="mt-2 text-sm text-gray-600">Hai <span class="font-semibold text-[#068b4b]">{{ Auth::user()->nama ?? 'Admin' }}</span>! 👋  
@@ -35,7 +35,7 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     {{-- Filters Section (UI saja; AJAX optional) --}}
-    <div class="bg-gray-50 rounded-lg p-6 mb-8 flex justify-between items-center">
+    <div class="bg-[#ffffff] shadow rounded-lg p-6 mb-8 flex justify-between items-center">
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-bold text-[#068b4b]">Filters</h3>
       </div>
@@ -77,12 +77,12 @@
 
     {{-- Statistics Cards --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="bg-[#ffffff] shadow rounded-lg p-6">
+      <a href="{{ route('admin.workshop.index') }}" class="bg-[#ffffff] shadow rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer">
         <div class="text-center">
           <div class="text-5xl font-bold text-gray-900 mb-2">{{ $statistics['total_workshop'] }}</div>
           <div class="text-sm font-bold text-[#068b4b]">Total Workshop</div>
         </div>
-      </div>
+      </a>
 
       <div class="bg-[#ffffff] shadow rounded-lg p-6">
         <div class="text-center">
@@ -91,19 +91,19 @@
         </div>
       </div>
 
-      <div class="bg-[#ffffff] shadow rounded-lg p-6">
+      <a href="{{ route('admin.request.index') }}" class="bg-[#ffffff] shadow rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer">
         <div class="text-center">
           <div class="text-5xl font-bold text-gray-900 mb-2">{{ $statistics['total_request'] }}</div>
           <div class="text-sm font-bold text-[#068b4b]">Total Request</div>
         </div>
-      </div>
+      </a>
 
-      <div class="bg-[#ffffff] shadow rounded-lg p-6">
+      <a href="{{ route('admin.account.manage') }}" class="bg-[#ffffff] shadow rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer">
         <div class="text-center">
           <div class="text-5xl font-bold text-gray-900 mb-2">{{ $statistics['total_user'] }}</div>
           <div class="text-sm font-bold text-[#068b4b]">Total User</div>
         </div>
-      </div>
+      </a>
     </div>
 
     {{-- Charts Section --}}
