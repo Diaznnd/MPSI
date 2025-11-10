@@ -36,6 +36,14 @@ class Workshop extends Model
     }
 
     /**
+     * Relasi ke MateriWorkshop
+     */
+    public function materi()
+    {
+        return $this->hasMany(MateriWorkshop::class, 'workshop_id', 'workshop_id');
+    }
+
+    /**
      * Cek apakah kuota sudah penuh
      */
     public function isQuotaFull()

@@ -149,7 +149,10 @@
 
                     <!-- Submit Button -->
                     <button type="submit" 
-                            class="px-6 py-2 bg-[#068B4B] hover:bg-[#08AA5C] text-white rounded-lg font-medium">
+                            class="px-6 py-2 text-white rounded-lg font-medium transition-colors"
+                            style="background-color: #068B4B;"
+                            onmouseover="this.style.backgroundColor='#08AA5C';"
+                            onmouseout="this.style.backgroundColor='#068B4B';">
                         Filter
                     </button>
 
@@ -234,7 +237,8 @@
                                         Pemateri
                                     </span>
                                 @elseif($user->role === 'pengguna')
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                          style="background-color: #fed7aa; color: #9a3412;">
                                         Pengguna
                                     </span>
                                 @else

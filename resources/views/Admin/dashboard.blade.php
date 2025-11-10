@@ -9,7 +9,7 @@
       <h1 class="text-3xl font-bold text-[#000000] mb-1">
         Dashboard
       </h1>
-      <p class="mt-2 text-sm text-gray-600">Hai <span class="font-semibold text-[#068b4b]">{{ Auth::user()->nama ?? 'Admin' }}</span>! 👋  
+      <p class="mt-2 text-sm text-gray-600">Hai <span class="font-semibold" style="color: #068b4b;">{{ Auth::user()->nama ?? 'Admin' }}</span>! 👋  
     Selamat datang di <span class="font-semibold">Sistem Workshop UNAND</span>.  
     Mari tingkatkan produktivitas dan semangat berbagi ilmu hari ini!</p>
     </div>

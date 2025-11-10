@@ -145,7 +145,7 @@ class WorkshopController extends Controller
             'waktu.regex' => 'Format waktu harus HH:MM (contoh: 09:00 atau 15:30)',
         ]);
 
-        $validated['status_workshop'] = $validated['status_workshop'] ?? 'nonaktif';
+        $validated['status_workshop'] = $validated['status_workshop'] ?? 'aktif';
 
         // Cek apakah pemateri_id adalah user dengan role pemateri
         $pemateri = User::find($validated['pemateri_id']);

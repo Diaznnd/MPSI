@@ -3,8 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\PemateriController;
-use App\Http\Controllers\PenggunaController;
+use App\Http\Controllers\Pemateri\PemateriController;
+use App\Http\Controllers\Pengguna\PenggunaController;
 use App\Http\Controllers\Admin\WorkshopController;
 use App\Http\Controllers\Admin\PendaftaranController;
 use App\Http\Controllers\Admin\AccountController;
@@ -59,11 +59,28 @@ Route::middleware(['auth'])
 
 
 // ===== PEMATERI =====
-Route::middleware(['pemateri'])->group(function () {
+Route::middleware(['auth', 'pemateri'])->group(function () {
     Route::get('/pemateri/dashboard', [PemateriController::class, 'index'])->name('pemateri.dashboard');
+    
+    // Materi Workshop Routes
+    Route::get('/pemateri/materi', [\App\Http\Controllers\Pemateri\MateriController::class, 'index'])->name('pemateri.materi.index');
+    Route::get('/pemateri/materi/{workshop_id}/create', [\App\Http\Controllers\Pemateri\MateriController::class, 'create'])->name('pemateri.materi.create');
+    Route::post('/pemateri/materi/{workshop_id}/store', [\App\Http\Controllers\Pemateri\MateriController::class, 'store'])->name('pemateri.materi.store');
+    Route::delete('/pemateri/materi/{materi_id}', [\App\Http\Controllers\Pemateri\MateriController::class, 'destroy'])->name('pemateri.materi.destroy');
 });
 
 // ===== PENGGUNA =====
-Route::middleware(['pengguna'])->group(function () {
+Route::middleware(['auth', 'pengguna'])->group(function () {
     Route::get('/pengguna/dashboard', [PenggunaController::class, 'index'])->name('pengguna.dashboard');
+    Route::get('/pengguna/my-workshop', [PenggunaController::class, 'myWorkshop'])->name('pengguna.my-workshop');
+    Route::get('/pengguna/daftar-workshop', [PenggunaController::class, 'daftarWorkshop'])->name('pengguna.daftar-workshop');
+    Route::get('/pengguna/request-workshop', [PenggunaController::class, 'requestWorkshop'])->name('pengguna.request-workshop');
+    Route::post('/pengguna/request-workshop', [PenggunaController::class, 'storeRequestWorkshop'])->name('pengguna.request-workshop.store');
+    Route::get('/pengguna/workshop/{workshop_id}/detail', [PenggunaController::class, 'workshopDetail'])->name('pengguna.workshop.detail');
+    Route::post('/pengguna/workshop/{workshop_id}/register', [PenggunaController::class, 'registerWorkshop'])->name('pengguna.workshop.register');
+});
+
+// ===== DOWNLOAD MATERI (for all authenticated users - access control in controller) =====
+Route::middleware(['auth'])->group(function () {
+    Route::get('/pengguna/materi/{materi_id}/download', [\App\Http\Controllers\Pemateri\MateriController::class, 'download'])->name('pengguna.materi.download');
 });
