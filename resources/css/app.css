@@ -12,3 +12,43 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+.animate-scroll {
+  animation: scroll 40s linear infinite;
+}
+
+    @keyframes scroll-horizontal {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+    }
+
+    .scroll-loop {
+    display: flex;
+    width: max-content;
+    animation: scroll-horizontal 15s linear infinite;
+    }
+    .scroll-wrapper {
+    overflow: hidden;
+    white-space: nowrap;
+    }
+
+    /* Pause animation saat hover */
+.hover-pause-animation:hover {
+    animation-play-state: paused !important;
+}
+
+.scroll-loop:has(.workshop-card:hover) {
+    animation-play-state: paused !important;
+}

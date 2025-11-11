@@ -91,7 +91,7 @@ class AccountController extends Controller
     private function calculateStatistics()
     {
         // Total Pengguna (all users)
-        $totalUsersNow = User::count();
+        $totalUsersNow = User::where('role', '!=', 'admin')->count();
         
         // Pengguna (users with role 'pengguna')
         $penggunaNow = User::where('role', 'pengguna')->count();

@@ -8,6 +8,7 @@
     <title>Sistem Informasi Workshop</title>
     <link rel="icon" type="image/png" href="{{ asset('images/LOGO UNAND.PNG') }}">
 
+
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @else
@@ -118,8 +119,7 @@
             </div>
         </footer>
     </div>
-
-    <script src="{{ mix('js/script.js') }}"></script> <!-- Or any common script -->
+    <script src="{{ asset('js/script.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

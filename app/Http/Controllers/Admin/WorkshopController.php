@@ -27,6 +27,24 @@ class WorkshopController extends Controller
             });
         }
 
+        $filterStatus = $request->get('status', 'all');
+
+        if ($filterStatus === 'aktif') {
+                $query->where(function($q) {
+                    $q->where('status_workshop', 'aktif')
+                    ->orWhereNull('status_workshop')
+                    ->orWhere('status_workshop', '');
+                });
+            } elseif ($filterStatus === 'penuh') {
+                $query->where('status_workshop', 'penuh');
+            } elseif ($filterStatus === 'selesai') {
+                $query->where('status_workshop', 'selesai');
+            } elseif ($filterStatus === 'nonaktif') {
+                $query->where('status_workshop', 'nonaktif');
+            }
+
+        $this->autoUpdateWorkshopStatus();
+
         // Urut terbaru & paginasi 12 per halaman
         $paginator = $query->orderByDesc('workshops.tanggal')
                    ->paginate(12)
@@ -66,7 +84,8 @@ class WorkshopController extends Controller
 
         return view('admin.workshop.index', [
             'workshops' => $paginator,
-            'stats' => $stats
+            'stats' => $stats,
+            'filterStatus' => $filterStatus
         ]);
     }
 
@@ -132,20 +151,23 @@ class WorkshopController extends Controller
             'pemateri_id' => 'required|exists:users,user_id', // Pastikan pemateri_id valid
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
-            'tanggal' => 'required|date',
+            'tanggal' => 'required|date|after_or_equal:today',
             'waktu' => ['required', 'regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/'],
             'lokasi' => 'required|string|max:255',
             'kuota' => 'required|integer|min:1',
             'kuota_terisi' => 'nullable|integer|min:0',
             'sampul_poster_url' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048',
-            'status_workshop' => 'nullable|string|in:aktif,nonaktif', // Sesuaikan status
+            'status_workshop' => 'nullable|string|in:aktif,nonaktif,penuh,selesai', // Sesuaikan status
             'keywords' => 'nullable|array',  // Validasi untuk keywords
             'keywords.*' => 'nullable|string|max:255', // Validasi setiap keyword
         ], [
             'waktu.regex' => 'Format waktu harus HH:MM (contoh: 09:00 atau 15:30)',
+            'tanggal.required' => 'Tanggal workshop wajib diisi.',
+            'tanggal.date' => 'Tanggal workshop tidak valid.',
+            'tanggal.after_or_equal' => 'Tanggal workshop tidak boleh sebelum hari ini.',
         ]);
 
-        $validated['status_workshop'] = $validated['status_workshop'] ?? 'nonaktif';
+        $validated['status_workshop'] = $validated['status_workshop'] ?? 'aktif';
 
         // Cek apakah pemateri_id adalah user dengan role pemateri
         $pemateri = User::find($validated['pemateri_id']);
@@ -157,6 +179,16 @@ class WorkshopController extends Controller
         if ($request->hasFile('sampul_poster_url')) {
             $posterPath = $request->file('sampul_poster_url')->store('workshop_images', 'public');
             $validated['sampul_poster_url'] = $posterPath;
+        }
+
+        // Pastikan waktu tidak lewat dari saat ini jika tanggal = hari ini
+        if (Carbon::parse($validated['tanggal'])->isToday()) {
+            $inputTime = Carbon::createFromFormat('H:i', $validated['waktu']);
+            if ($inputTime->lt(Carbon::now())) {
+                return redirect()->back()
+                    ->withErrors(['waktu' => 'Waktu tidak boleh lebih awal dari waktu sekarang.'])
+                    ->withInput();
+            }
         }
 
         // Simpan workshop ke database
@@ -182,6 +214,7 @@ class WorkshopController extends Controller
     {
         // Eager load relationships untuk menghindari N+1 query
         $workshop->load('pemateri', 'keywords');
+        $this->autoUpdateWorkshopStatus();
         
         return view('admin.workshop.show', compact('workshop'));
     }
@@ -204,18 +237,21 @@ class WorkshopController extends Controller
             'pemateri_id' => 'required|exists:users,user_id',
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
-            'tanggal' => 'required|date',
+            'tanggal' => 'required|date|after_or_equal:today',
             'waktu' => ['required', 'regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/'],
             'lokasi' => 'required|string|max:255',
             'kuota' => 'required|integer|min:1',
             'kuota_terisi' => 'nullable|integer|min:0',
             'sampul_poster_url' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048',
-            'status_workshop' => 'nullable|string|in:aktif,nonaktif',
+            'status_workshop' => 'nullable|string|in:aktif,nonaktif,penuh,selesai',
             'keywords' => 'nullable|array',
             'keywords.*' => 'nullable|string|max:255',
             'remove_image' => 'nullable|boolean',
         ], [
             'waktu.regex' => 'Format waktu harus HH:MM (contoh: 09:00 atau 15:30)',
+            'tanggal.required' => 'Tanggal workshop wajib diisi.',
+            'tanggal.date' => 'Tanggal workshop tidak valid.',
+            'tanggal.after_or_equal' => 'Tanggal workshop tidak boleh sebelum hari ini.',
         ]);
 
         // Cek apakah pemateri_id adalah user dengan role pemateri
@@ -231,6 +267,16 @@ class WorkshopController extends Controller
                 Storage::disk('public')->delete($workshop->sampul_poster_url);
             }
             $validated['sampul_poster_url'] = null;
+        }
+
+        // Pastikan waktu tidak lewat dari saat ini jika tanggal = hari ini
+        if (Carbon::parse($validated['tanggal'])->isToday()) {
+            $inputTime = Carbon::createFromFormat('H:i', $validated['waktu']);
+            if ($inputTime->lt(Carbon::now())) {
+                return redirect()->back()
+                    ->withErrors(['waktu' => 'Waktu tidak boleh lebih awal dari waktu sekarang.'])
+                    ->withInput();
+            }
         }
 
         // Proses upload sampul poster jika ada file baru
@@ -273,6 +319,38 @@ class WorkshopController extends Controller
             ->with('success', 'Workshop berhasil diperbarui.');
     }
 
+    /**
+     * Update otomatis status workshop:
+     * - Jadi 'penuh' jika kuota sudah habis
+     * - Jadi 'selesai' jika tanggal & waktu sudah lewat
+     */
+    private function autoUpdateWorkshopStatus()
+    {
+        $now = Carbon::now();
+
+        $workshops = Workshop::whereIn('status_workshop', ['aktif', 'penuh'])->get();
+
+        foreach ($workshops as $workshop) {
+            $kuotaTerisi = $workshop->kuota_terisi ?? $workshop->pendaftaran()->count();
+            $kuotaMax = $workshop->kuota;
+
+            // 1️⃣ Jika kuota penuh
+            if ($kuotaMax > 0 && $kuotaTerisi >= $kuotaMax && $workshop->status_workshop !== 'penuh') {
+                $workshop->status_workshop = 'penuh';
+                $workshop->save();
+                continue; // lanjut ke workshop berikutnya
+            }
+
+            // 2️⃣ Jika sudah lewat tanggal & waktu
+            $waktuWorkshop = Carbon::parse($workshop->tanggal . ' ' . $workshop->waktu);
+            if ($waktuWorkshop->lt($now) && $workshop->status_workshop !== 'selesai') {
+                $workshop->status_workshop = 'selesai';
+                $workshop->save();
+            }
+        }
+    }
+
+
     public function updateStatus(Request $request, Workshop $workshop)
     {
         $validated = $request->validate([
@@ -309,15 +387,24 @@ class WorkshopController extends Controller
      */
     private function checkAndUpdateQuotaStatus(Workshop $workshop)
     {
-        $currentTerisi = $workshop->kuota_terisi !== null ? $workshop->kuota_terisi : $workshop->pendaftaran()->count();
+        $currentTerisi = $workshop->kuota_terisi ?? $workshop->pendaftaran()->count();
         $maxKuota = $workshop->kuota ?? 0;
-        
-        // Jika kuota sudah penuh dan status masih aktif, ubah ke nonaktif
+
+        // Jika kuota penuh dan masih aktif, ubah ke "penuh"
         if ($maxKuota > 0 && $currentTerisi >= $maxKuota && $workshop->status_workshop === 'aktif') {
-            $workshop->status_workshop = 'nonaktif';
+            $workshop->status_workshop = 'penuh';
+            $workshop->save();
+        }
+
+        // Jika sudah lewat tanggal & waktu → selesai
+        $now = Carbon::now();
+        $tanggalWaktu = Carbon::parse($workshop->tanggal . ' ' . $workshop->waktu);
+        if ($tanggalWaktu->lt($now) && $workshop->status_workshop !== 'selesai') {
+            $workshop->status_workshop = 'selesai';
             $workshop->save();
         }
     }
+
 
     public function destroy(Workshop $workshop)
     {

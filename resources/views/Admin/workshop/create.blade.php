@@ -197,11 +197,10 @@
 
                 <!-- Button Action -->
                 <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
-                    <button type="button" 
-                            onclick="window.history.back()" 
+                    <a href="{{ route('admin.workshop.index') }}"
                             class="px-8 py-3 bg-gray-400 hover:bg-gray-500 text-white rounded-lg font-medium">
                         Batal
-                    </button>
+                    </a>
                     <button type="submit" class="px-8 py-3 bg-[#068B4B] hover:bg-[#08AA5C] text-white rounded-lg font-medium">
                         Buat Workshop
                     </button>
@@ -211,6 +210,18 @@
     </div>
 </div>
 @endsection
+
+@if ($errors->any())
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Gagal menyimpan!',
+        html: `{!! implode('<br>', $errors->all()) !!}`,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#dc2626'
+    });
+</script>
+@endif
 
 @push('scripts') 
     <!-- Push your external JavaScript file here -->

@@ -84,7 +84,7 @@
                     <p class="text-3xl font-bold text-gray-900">{{ $stats['workshop_nonaktif']['value'] }}</p>
                 </div>
                 <div class="flex items-center">
-                    <span class="text-sm font-medium text-gray-600">
+                    <span class="text-sm font-medium text-red-600">
                         Nonaktif
                     </span>
                     <span class="ml-2 text-xs text-gray-500">Status</span>
@@ -93,8 +93,8 @@
         </div>
 
     {{-- Add Workshop --}}
-    <div class="mt-6 flex justify-between items-center">
-      <div class="mb-6">
+    <div class="mt-6 flex justify-between items-center mb-10">
+      <div>
         <a href="{{ route('admin.workshop.create') }}"
           class="bg-[#068B4B] hover:bg-[#08AA5C] text-white px-6 py-3 rounded-lg text-sm font-medium inline-flex items-center">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,7 +105,26 @@
       </div>
 
       {{-- Search Bar --}}
-      <div class="rounded-lg p-3 mb-2">
+      <div class="flex items-center rounded-lg p-0">
+        <form method="GET" action="{{ route('admin.workshop.index') }}" id="filterForm" class="relative">
+            <div class="relative mr-4">
+                <select name="status"
+                        onchange="document.getElementById('filterForm').submit()"
+                        class="appearance-none px-4 py-3 pr-10 border border-gray-300 rounded-xl bg-white text-sm text-gray-700 focus:ring-2 focus:ring-[#068B4B] focus:border-[#068B4B] transition duration-200 cursor-pointer shadow-sm hover:shadow-md">
+                    <option value="all" {{ $filterStatus === 'all' ? 'selected' : '' }}>Semua Status</option>
+                    <option value="aktif" {{ $filterStatus === 'aktif' ? 'selected' : '' }}>🟢 Aktif</option>
+                    <option value="penuh" {{ $filterStatus === 'penuh' ? 'selected' : '' }}>🟡 Penuh</option>
+                    <option value="selesai" {{ $filterStatus === 'selesai' ? 'selected' : '' }}>🔵 Selesai</option>
+                    <option value="nonaktif" {{ $filterStatus === 'nonaktif' ? 'selected' : '' }}>🔴 Nonaktif</option>
+                </select>
+                <svg class="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+        </form>
+
         <form method="GET" action="{{ route('admin.workshop.index') }}" class="relative max-w-md ml-auto">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,7 +132,7 @@
             </svg>
           </div>
           <input type="text" name="q" value="{{ request('q') }}"
-                class="block w-full pl-10 pr-29 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                class="block w-full pl-10 pr-29 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[#057A55] focus:border-[#057A55]"
                 placeholder="Cari Workshop Disini"
                 id="searchWorkshop">
         </form>

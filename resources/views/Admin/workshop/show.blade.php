@@ -207,7 +207,7 @@
                         </a>
                         <button onclick="cancelWorkshop()" 
                                 class="w-full bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-lg font-medium transition-colors">
-                            BATALKAN
+                            HAPUS
                         </button>
                     </div>
                 </div>
@@ -217,10 +217,12 @@
 </div>
 
 <!-- Modal Pembatalan -->
-<div id="cancelModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+<div id="cancelModal" class="fixed inset-0 bg-black/50 bg-opacity-50 hidden items-center justify-center z-50">
     <div class="bg-white rounded-lg p-6 max-w-md mx-4">
-        <h3 class="text-lg font-bold text-gray-900 mb-4">Konfirmasi Pembatalan</h3>
-        <p class="text-gray-600 mb-6">Apakah Anda yakin ingin membatalkan workshop ini? Tindakan ini tidak dapat dibatalkan.</p>
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Konfirmasi Penghapusan</h3>
+        <p class="text-gray-600 mb-6">Apakah Anda yakin ingin <span class="font-semibold text-red-600">menghapus</span> workshop ini secara permanen?  
+            Data yang dihapus tidak dapat dikembalikan.
+        </p>
         <div class="flex space-x-3">
             <button onclick="closeModal()" 
                     class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg font-medium">
@@ -231,7 +233,7 @@
                 @method('DELETE')
                 <button type="submit" 
                         class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg font-medium">
-                    Ya, Batalkan
+                    Ya, Hapus
                 </button>
             </form>
         </div>

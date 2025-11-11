@@ -244,3 +244,5 @@ document.addEventListener("DOMContentLoaded", function() {
   updateClock(); // tampilkan segera
   setInterval(updateClock, 1000); // perbarui tiap detik
 });
+
+

@@ -56,6 +56,49 @@ class RequestWorkshopSeeder extends Seeder
             ],
         ];
 
+        $requests = [
+            [
+                'user_id' => 20,
+                'judul' => 'Pengembangan Soft Skill Mahasiswa Baru',
+                'deskripsi' => 'Workshop ini berfokus pada peningkatan kemampuan komunikasi, kerja tim, dan manajemen diri untuk mahasiswa baru.',
+                'status_request' => 'menunggu',
+                'tanggal_tanggapan' => null,
+                'catatan_admin' => null,
+            ],
+            [
+                'user_id' => 21,
+                'judul' => 'Pelatihan Dasar Microsoft Excel untuk Penelitian',
+                'deskripsi' => 'Memberikan pemahaman dasar penggunaan Excel untuk analisis data sederhana bagi mahasiswa semua jurusan.',
+                'status_request' => 'menunggu',
+                'tanggal_tanggapan' => null,
+                'catatan_admin' => null,
+            ],
+            [
+                'user_id' => 22,
+                'judul' => 'Kreativitas Konten Digital untuk Promosi Kampus',
+                'deskripsi' => 'Membantu mahasiswa memahami cara membuat konten digital menarik untuk keperluan promosi kegiatan kampus.',
+                'status_request' => 'menunggu',
+                'tanggal_tanggapan' => null,
+                'catatan_admin' => null,
+            ],
+            [
+                'user_id' => 23,
+                'judul' => 'Pengenalan Data Science bagi Mahasiswa Non-Teknik',
+                'deskripsi' => 'Workshop pengantar yang menjelaskan konsep dasar data science dan penerapannya di berbagai bidang studi.',
+                'status_request' => 'menunggu',
+                'tanggal_tanggapan' => null,
+                'catatan_admin' => null,
+            ],
+            [
+                'user_id' => 24,
+                'judul' => 'Pelatihan Menulis Artikel Ilmiah untuk Jurnal Kampus',
+                'deskripsi' => 'Pelatihan tentang cara menyusun artikel ilmiah dengan struktur yang benar sesuai standar jurnal kampus.',
+                'status_request' => 'menunggu',
+                'tanggal_tanggapan' => null,
+                'catatan_admin' => null,
+            ],
+        ];
+
         DB::table('request_workshop')->insert($requests);
     }
 }

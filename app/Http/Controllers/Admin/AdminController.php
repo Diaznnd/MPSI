@@ -15,118 +15,125 @@ class AdminController extends Controller
 {
     public function index()
     {
-        // ===== Statistik ringkas (tanpa kolom yang tidak ada di skema) =====
+        $today = Carbon::today();
+        $year = Carbon::now()->year;
+        
+        // ===== Statistik Workshop =====
+        // Workshop yang lagi jalan (sedang berlangsung): tanggal >= hari ini (akan datang atau sedang berlangsung)
+        $workshop_lagi_jalan = Workshop::where('tanggal', '>=', $today)->count();
+        
+        // Workshop selesai: tanggal < hari ini (sudah lewat tanggalnya)
+        $workshop_selesai = Workshop::where('status_workshop', 'selesai')->count();
+        
+        // Workshop batal: status nonaktif (dibatalkan, tidak peduli tanggal)
+        $workshop_batal = Workshop::where('status_workshop', 'nonaktif')
+            ->orWhereNull('status_workshop')
+            ->count();
+        
+        // Workshop open pendaftaran: status aktif (buka pendaftaran)
+        $workshop_open_pendaftaran = Workshop::where('status_workshop', 'aktif')->count();
+
+        $totalRequest = RequestWorkshop::where('status_request', 'menunggu')->count();
+
+        $totalUser = User::where('role', 'pengguna')->count();
+
+        $totalpemateri = User::where('role', 'pemateri')->count();
+        
         $statistics = [
-            'total_workshop'            => Workshop::count(),           // tidak filter status_workshop
-            'total_peserta_terdaftar'   => Pendaftaran::count(),
-            'total_request'             => class_exists(\App\Models\RequestWorkshop::class) ? RequestWorkshop::count() : 0,
-            'total_user'                => User::count(),
+            'workshop_lagi_jalan'        => $workshop_lagi_jalan,
+            'workshop_selesai'           => $workshop_selesai,
+            'workshop_batal'             => $workshop_batal,
+            'workshop_open_pendaftaran'  => $workshop_open_pendaftaran,
+            'total_request'              => $totalRequest,
+            'total_user'                 => $totalUser,
+            'total_pemateri'             => $totalpemateri
         ];
 
-        // ===== Department (prodi_fakultas) leaderboard dari pendaftaran =====
-        [$departmentData, $departmentMax] = $this->getDepartmentData();
+        $calendarWorkshops = Workshop::whereYear('tanggal', $year)
+        ->where('status_workshop', 'aktif')
+        ->orderBy('tanggal', 'asc')
+        ->get();
 
-        // ===== Tren pendaftaran 7 bulan terakhir (pakai pendaftaran.tanggal_daftar) =====
-        $trendData = $this->getTrendData();
+        $recentWorkshops = Workshop::orderBy('created_at', 'desc')
+                        ->take(5)
+                        ->get();
+
+        $pelaksanaan = Workshop::selectRaw('MONTH(tanggal) as bulan, COUNT(*) as total')
+        ->whereYear('tanggal', Carbon::now()->year)
+        ->groupBy('bulan')
+        ->pluck('total', 'bulan');
+
+    $data = [];
+    for ($i = 1; $i <= 12; $i++) {
+        $data[$i] = $pelaksanaan[$i] ?? 0;
+    }
+
+    $labels = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    // Generate chart sebagai URL dari QuickChart
+    $chartUrl = 'https://quickchart.io/chart?c=' . urlencode(json_encode([
+        'type' => 'bar', // ganti jadi 'line' jika ingin line chart
+        'data' => [
+            'labels' => $labels,
+            'datasets' => [[
+                'label' => 'Jumlah Workshop per Bulan',
+                'data' => array_values($data),
+                'backgroundColor' => 'rgba(6, 139, 75, 0.7)',
+                'borderColor' => 'rgba(6, 139, 75, 1)',
+                'fill' => false,
+            ]]
+        ],
+        'options' => [
+            'scales' => [
+                'y' => ['beginAtZero' => true]
+            ],
+            'plugins' => [
+                'title' => ['display' => true, 'text' => 'Statistik Workshop ' . date('Y')]
+            ]
+        ]
+    ]));
+
+    // === DATA UNTUK LINE CHART: Workshop Aktif vs Nonaktif ===
+    $selesaiPerBulan = Workshop::selectRaw('MONTH(tanggal) as bulan, COUNT(*) as total')
+        ->where('status_workshop', 'selesai')
+        ->whereYear('tanggal', now()->year)
+        ->groupBy('bulan')
+        ->pluck('total', 'bulan');
+
+    $aktifPerBulan = Workshop::selectRaw('MONTH(tanggal) as bulan, COUNT(*) as total')
+        ->where('status_workshop', 'aktif')
+        ->whereYear('tanggal', now()->year)
+        ->groupBy('bulan')
+        ->pluck('total', 'bulan');
+
+    // pastikan semua bulan (1–12) terisi angka 0 kalau belum ada data
+    $labels = [
+        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+    ];
+
+    $selesaiData = [];
+    $aktifData = [];
+
+    foreach (range(1, 12) as $i) {
+        $selesaiData[] = $selesaiPerBulan[$i] ?? 0;
+        $aktifData[] = $aktifPerBulan[$i] ?? 0;
+    }
+
 
         return view('admin.dashboard', compact(
             'statistics',
-            'departmentData',
-            'departmentMax',
-            'trendData'
+            'calendarWorkshops',
+            'year',
+            'recentWorkshops',
+            'chartUrl',
+            'labels',
+            'selesaiData',
+            'aktifData'
         ));
-    }
-
-    private function getTrendData()
-    {
-        $labels = [];
-        $series = [];
-
-        // 7 titik (termasuk bulan ini): M-6 ... M
-        for ($i = 6; $i >= 0; $i--) {
-            $month = Carbon::now()->subMonths($i);
-            $labels[] = $month->format('M Y');
-
-            $count = Pendaftaran::whereMonth('tanggal_daftar', $month->month)
-                ->whereYear('tanggal_daftar', $month->year)
-                ->count();
-
-            $series[] = $count;
-        }
-
-        return [
-            'labels' => $labels,
-            'data'   => $series,
-        ];
-    }
-
-    /**
-     * Ambil 5 besar prodi_fakultas berdasarkan jumlah pendaftaran.
-     * Menggunakan join pendaftaran → users (users.user_id).
-     */
-    private function getDepartmentData()
-    {
-        $rows = Pendaftaran::join('users', 'pendaftaran.user_id', '=', 'users.user_id')
-            ->select('users.prodi_fakultas as name', DB::raw('COUNT(*) as cnt'))
-            ->whereNotNull('users.prodi_fakultas')
-            ->groupBy('users.prodi_fakultas')
-            ->orderByDesc('cnt')
-            ->limit(5)
-            ->get();
-
-        $data = $rows->map(fn($r) => ['name' => $r->name, 'count' => (int) $r->cnt])->toArray();
-        $max  = max(array_column($data ?: [['count'=>0]], 'count')) ?: 1; // hindari pembagi 0
-
-        return [$data, $max];
-    }
-
-    /**
-     * Endpoint filter (opsional): filter berbasis tanggal & prodi_fakultas.
-     * Catatan: tabel workshops tidak punya faculty/department; jadi filter “fakultas”
-     * diinterpretasikan sebagai users.prodi_fakultas via pendaftaran.
-     */
-    public function filterData(Request $request)
-    {
-        $start = $request->date('start_date', now()->subMonths(6)->startOfMonth());
-        $end   = $request->date('end_date', now());
-        $prodi = $request->input('department'); // alias fakultas/department → prodi_fakultas
-
-        // Trend terfilter
-        $labels = [];
-        $series = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $m = Carbon::parse($end)->subMonths($i);
-            $labels[] = $m->format('M Y');
-
-            $q = Pendaftaran::whereMonth('tanggal_daftar', $m->month)
-                ->whereYear('tanggal_daftar', $m->year);
-
-            if ($prodi) {
-                $q->join('users', 'pendaftaran.user_id', '=', 'users.user_id')
-                  ->where('users.prodi_fakultas', $prodi);
-            }
-
-            $series[] = $q->count();
-        }
-
-        // Department leaderboard terfilter rentang tanggal
-        $deptRows = Pendaftaran::join('users', 'pendaftaran.user_id', '=', 'users.user_id')
-            ->whereBetween('tanggal_daftar', [$start, $end])
-            ->when($prodi, fn($qq) => $qq->where('users.prodi_fakultas', $prodi))
-            ->select('users.prodi_fakultas as name', DB::raw('COUNT(*) as cnt'))
-            ->whereNotNull('users.prodi_fakultas')
-            ->groupBy('users.prodi_fakultas')
-            ->orderByDesc('cnt')
-            ->limit(5)
-            ->get();
-
-        $deptData = $deptRows->map(fn($r) => ['name' => $r->name, 'count' => (int) $r->cnt])->toArray();
-        $deptMax  = max(array_column($deptData ?: [['count'=>0]], 'count')) ?: 1;
-
-        return response()->json([
-            'status' => 'success',
-            'trend'  => ['labels' => $labels, 'data' => $series],
-            'departments' => ['data' => $deptData, 'max' => $deptMax],
-        ]);
     }
 }
