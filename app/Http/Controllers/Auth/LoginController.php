@@ -36,6 +36,12 @@ class LoginController extends Controller
         // Jika login sukses
         Auth::login($user);
 
+        // Redirect ke intended URL jika ada, jika tidak redirect berdasarkan role
+        $intendedUrl = $request->session()->pull('url.intended');
+        if ($intendedUrl) {
+            return redirect($intendedUrl);
+        }
+
         // Redirect berdasarkan role user
         switch ($user->role) {
             case 'admin':

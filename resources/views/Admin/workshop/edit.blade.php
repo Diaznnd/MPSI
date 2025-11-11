@@ -271,6 +271,19 @@
 </div>
 @endsection
 
+@if ($errors->any())
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Gagal menyimpan!',
+        html: `{!! implode('<br>', $errors->all()) !!}`,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#dc2626'
+    });
+</script>
+@endif
+
+
 @push('scripts') 
     <script src="{{ asset('js/script.js') }}"></script>
 @endpush
