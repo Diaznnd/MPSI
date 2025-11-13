@@ -16,7 +16,29 @@ class PenggunaController extends Controller
 {
     public function index()
     {
-        return view('User.dashboard');
+        $user_id = Auth::id();
+        $user = Auth::user();
+
+        // Hitung jumlah workshop yang dibuat user (jika user adalah pemateri)
+        $workshopSaya = 0;
+        if ($user->role === 'pemateri') {
+            $workshopSaya = Workshop::where('pemateri_id', $user_id)->count();
+        }
+
+        // Hitung jumlah pendaftaran user
+        $terdaftar = Pendaftaran::where('user_id', $user_id)->count();
+
+        // Hitung jumlah request workshop user
+        $request = RequestWorkshop::where('user_id', $user_id)->count();
+
+        // Ambil riwayat workshop terbaru (pendaftaran user)
+        $riwayatWorkshop = Pendaftaran::with(['workshop.pemateri'])
+            ->where('user_id', $user_id)
+            ->orderBy('tanggal_daftar', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('User.dashboard', compact('workshopSaya', 'terdaftar', 'request', 'riwayatWorkshop'));
     }
 
     public function myWorkshop(Request $request)
