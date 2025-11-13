@@ -78,6 +78,11 @@ Route::middleware(['auth', 'pengguna'])->group(function () {
     Route::post('/pengguna/request-workshop', [PenggunaController::class, 'storeRequestWorkshop'])->name('pengguna.request-workshop.store');
     Route::get('/pengguna/workshop/{workshop_id}/detail', [PenggunaController::class, 'workshopDetail'])->name('pengguna.workshop.detail');
     Route::post('/pengguna/workshop/{workshop_id}/register', [PenggunaController::class, 'registerWorkshop'])->name('pengguna.workshop.register');
+    
+    // Profile Management
+    Route::get('/pengguna/profile', [\App\Http\Controllers\Pengguna\ProfileController::class, 'index'])->name('pengguna.profile.index');
+    Route::get('/pengguna/profile/edit', [\App\Http\Controllers\Pengguna\ProfileController::class, 'edit'])->name('pengguna.profile.edit');
+    Route::put('/pengguna/profile/update', [\App\Http\Controllers\Pengguna\ProfileController::class, 'updateProfile'])->name('pengguna.profile.update');
 });
 
 // ===== DOWNLOAD MATERI (for all authenticated users - access control in controller) =====
