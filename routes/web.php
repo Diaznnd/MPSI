@@ -79,6 +79,12 @@ Route::middleware(['auth', 'pengguna'])->group(function () {
     Route::get('/pengguna/workshop/{workshop_id}/detail', [PenggunaController::class, 'workshopDetail'])->name('pengguna.workshop.detail');
     Route::post('/pengguna/workshop/{workshop_id}/register', [PenggunaController::class, 'registerWorkshop'])->name('pengguna.workshop.register');
     
+    // Forum Diskusi
+    Route::get('/pengguna/workshop/{workshop_id}/forum', [\App\Http\Controllers\Pengguna\ForumDiskusiController::class, 'index'])->name('pengguna.forum.index');
+    Route::post('/pengguna/workshop/{workshop_id}/forum', [\App\Http\Controllers\Pengguna\ForumDiskusiController::class, 'store'])->name('pengguna.forum.store');
+    Route::put('/pengguna/workshop/{workshop_id}/forum/{discussion_id}', [\App\Http\Controllers\Pengguna\ForumDiskusiController::class, 'update'])->name('pengguna.forum.update');
+    Route::delete('/pengguna/workshop/{workshop_id}/forum/{discussion_id}', [\App\Http\Controllers\Pengguna\ForumDiskusiController::class, 'destroy'])->name('pengguna.forum.destroy');
+    
     // Profile Management
     Route::get('/pengguna/profile', [\App\Http\Controllers\Pengguna\ProfileController::class, 'index'])->name('pengguna.profile.index');
     Route::get('/pengguna/profile/edit', [\App\Http\Controllers\Pengguna\ProfileController::class, 'edit'])->name('pengguna.profile.edit');

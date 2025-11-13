@@ -44,6 +44,14 @@ class Workshop extends Model
     }
 
     /**
+     * Relasi ke ForumDiskusi
+     */
+    public function forumDiskusi()
+    {
+        return $this->hasMany(ForumDiskusi::class, 'workshop_id', 'workshop_id');
+    }
+
+    /**
      * Cek apakah kuota sudah penuh
      */
     public function isQuotaFull()

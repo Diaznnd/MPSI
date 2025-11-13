@@ -42,4 +42,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Pendaftaran::class, 'user_id', 'user_id');
     }
+
+    public function forumDiskusi()
+    {
+        return $this->hasMany(ForumDiskusi::class, 'user_id', 'user_id');
+    }
 }
