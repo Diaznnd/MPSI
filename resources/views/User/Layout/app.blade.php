@@ -57,15 +57,19 @@
             @endif
             
             <!-- User Dropdown -->
-            <li class="hs-dropdown relative inline-flex [--placement:bottom-right]">
-                <button id="hs-dropdown-with-header" 
+            <li class="relative">
+                <button id="user-dropdown-toggle" 
                         type="button" 
-                        class="hs-dropdown-toggle flex items-center space-x-2 text-gray-600 hover:text-[#057A55] focus:outline-none">
+                        class="flex items-center space-x-2 text-gray-600 hover:text-[#057A55] focus:outline-none">
                     <div class="w-8 h-8 rounded-full overflow-hidden bg-[#057A55] flex items-center justify-center border-2 border-[#057A55]">
-                        @if(Auth::user()->foto_profil_url && Auth::user()->foto_profil_url != 'default_profile.jpg')
+                        @if(Auth::user()->foto_profil_url)
                             <img src="{{ asset('storage/' . Auth::user()->foto_profil_url) }}" 
                                  alt="{{ Auth::user()->nama }}" 
-                                 class="w-full h-full object-cover">
+                                 class="w-full h-full object-cover"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <span class="text-white text-sm font-bold hidden">
+                                {{ strtoupper(substr(Auth::user()->nama, 0, 1)) }}
+                            </span>
                         @else
                             <span class="text-white text-sm font-bold">
                                 {{ strtoupper(substr(Auth::user()->nama, 0, 1)) }}
@@ -73,23 +77,30 @@
                         @endif
                     </div>
                     <span class="hidden xl:block">{{ Auth::user()->nama }}</span>
-                    <svg class="hs-dropdown-open:rotate-180 w-4 h-4 text-gray-600 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg id="user-dropdown-arrow" class="w-4 h-4 text-gray-600 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
 
-                <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-[15rem] bg-white shadow-md rounded-lg p-2 mt-2 divide-y divide-gray-100"
-                     aria-labelledby="hs-dropdown-with-header">
+                <div id="user-dropdown-menu" 
+                     class="hidden absolute right-0 mt-2 min-w-60 bg-white shadow-lg rounded-lg p-2 divide-y divide-gray-100 z-50">
                     <div class="py-3 px-4 -m-2 bg-gray-50 rounded-t-lg">
                         <p class="text-sm font-semibold text-gray-900">{{ Auth::user()->nama }}</p>
                         <p class="text-sm text-gray-500 truncate">{{ Auth::user()->email }}</p>
                         <p class="text-xs text-gray-400 mt-1">{{ Auth::user()->prodi_fakultas ?? 'User' }} | {{ ucfirst(Auth::user()->role) }}</p>
                     </div>
                     <div class="mt-2 py-2">
-                        <form action="{{ route('logout') }}" method="POST">
+                        <a href="{{ route('pengguna.profile.index') }}" 
+                           class="w-full text-left flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#057A55] transition-colors {{ request()->routeIs('pengguna.profile.*') ? 'bg-green-50 text-[#057A55]' : '' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            Profile
+                        </a>
+                        <form action="{{ route('logout') }}" method="POST" class="mt-1">
                             @csrf
                             <button type="submit" 
-                                    class="w-full text-left flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    class="w-full text-left flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                                 </svg>
@@ -121,10 +132,14 @@
             <div class="px-3 py-3 border-b border-gray-200 mb-2">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-full overflow-hidden bg-[#057A55] flex items-center justify-center border-2 border-[#057A55]">
-                        @if(Auth::user()->foto_profil_url && Auth::user()->foto_profil_url != 'default_profile.jpg')
+                        @if(Auth::user()->foto_profil_url)
                             <img src="{{ asset('storage/' . Auth::user()->foto_profil_url) }}" 
                                  alt="{{ Auth::user()->nama }}" 
-                                 class="w-full h-full object-cover">
+                                 class="w-full h-full object-cover"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <span class="text-white text-sm font-bold hidden">
+                                {{ strtoupper(substr(Auth::user()->nama, 0, 1)) }}
+                            </span>
                         @else
                             <span class="text-white text-sm font-bold">
                                 {{ strtoupper(substr(Auth::user()->nama, 0, 1)) }}
@@ -163,6 +178,12 @@
                     Request Workshop
                 </a>
             @endif
+            
+            <!-- Profile Link Mobile -->
+            <a href="{{ route('pengguna.profile.index') }}" 
+               class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('pengguna.profile.*') ? 'text-[#057A55] bg-green-50' : 'text-gray-600 hover:text-[#057A55] hover:bg-gray-50' }}">
+                Profile
+            </a>
             
             <!-- Logout Button Mobile -->
             <form action="{{ route('logout') }}" method="POST" class="pt-2 border-t border-gray-200">
@@ -230,6 +251,39 @@
                     }
                 }
             });
+
+            // User dropdown toggle
+            const userDropdownToggle = document.getElementById('user-dropdown-toggle');
+            const userDropdownMenu = document.getElementById('user-dropdown-menu');
+            const userDropdownArrow = document.getElementById('user-dropdown-arrow');
+
+            if (userDropdownToggle && userDropdownMenu) {
+                userDropdownToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdownMenu.classList.toggle('hidden');
+                    userDropdownArrow.classList.toggle('rotate-180');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (userDropdownToggle && userDropdownMenu) {
+                        const isClickInside = userDropdownToggle.contains(event.target) || userDropdownMenu.contains(event.target);
+                        if (!isClickInside && !userDropdownMenu.classList.contains('hidden')) {
+                            userDropdownMenu.classList.add('hidden');
+                            userDropdownArrow.classList.remove('rotate-180');
+                        }
+                    }
+                });
+
+                // Close dropdown when clicking on a link
+                const dropdownLinks = userDropdownMenu.querySelectorAll('a, button[type="submit"]');
+                dropdownLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        userDropdownMenu.classList.add('hidden');
+                        userDropdownArrow.classList.remove('rotate-180');
+                    });
+                });
+            }
         });
     </script>
 </body>

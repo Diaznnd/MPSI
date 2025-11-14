@@ -4,9 +4,16 @@
 
 @section('content')
     <!-- Welcome Section -->
-    <div class="bg-gradient-to-r from-[#057A55] to-[#016545] rounded-xl shadow-lg p-6 md:p-8 mb-6 md:mb-8 text-white">
-        <h2 class="text-2xl md:text-3xl font-bold mb-2 text-black">Selamat Datang, {{ Auth::user()->nama }}!</h2>
-        <p class="text-sm md:text-base font-medium" style="color: #057A55;">Kelola workshop Anda dan daftarkan diri untuk workshop yang tersedia.</p>
+    <div class="bg-ffffff rounded-xl shadow-lg p-3 md:p-8 mb-6 md:mb-8 text-white">
+            <div class="flex items-center justify-between">
+                <div class="w-1/2"> 
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-black">Selamat Datang, {{ Auth::user()->nama }}!</h2>
+                    <p class="text-sm md:text-base font-medium" style="color: #057A55;">Kelola workshop Anda dan daftarkan diri untuk workshop yang tersedia.</p>
+                </div>
+                <div class="w-1/2 flex justify-end">
+                    <img src="{{ asset('images/perpustakaan.jpg') }}" alt="Universitas Andalas Logo" class="w-100 rounded-lg justify-end items-end shadow-md">
+                </div> 
+            </div>
     </div>
 
     <!-- Stats Cards -->
@@ -43,7 +50,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-600 text-sm font-medium">Request</p>
-                    <p class="text-3xl font-bold text-gray-800 mt-2">{{ $request }}</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-2">{{ $totalRequest }}</p>
                 </div>
                 <div class="bg-yellow-100 p-3 rounded-full">
                     <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,6 +60,108 @@
             </div>
         </div>
     </div>
+
+    <div class="bg-[#ffffff] rounded-lg p-8 mb-12 relative z-10">
+                <h2 class="text-xl text-center font-bold text-gray-900 mb-6">Workshop Populer</h2>
+                <p class="text-l text-center text-gray-600 mb-8">Workshop dengan pendaftar terbanyak yang sedang dibuka</p>
+
+                @if($popular_workshops->count() > 0)
+                <div class="scroll-wrapper">
+                    <div class="scroll-loop gap-6 hover-pause-animation">
+                        @foreach($popular_workshops as $workshop)
+                        <a href="{{ route('pengguna.daftar-workshop') }}" class="block w-80 mt-4 mb-4 shrink-0 workshop-card">
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:scale-105 hover:ring-4 hover:ring-[#057A55] hover:ring-opacity-50">
+                                <div class="h-48 bg-gray-200 overflow-hidden">
+                                    @if($workshop->sampul_poster_url)
+                                        <img src="{{ asset('storage/' . $workshop->sampul_poster_url) }}" 
+                                            alt="{{ $workshop->judul }}" 
+                                            class="w-full h-full object-cover transition-transform duration-300 hover:scale-110">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center bg-linier-to-br from-[#057A55] to-[#016545]">
+                                            <svg class="w-16 h-16 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                            </svg>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="p-6">
+                                    <h3 class="text-l font-bold text-gray-900 mb-2 truncate">{{ $workshop->judul }}</h3>
+                                    <div class="flex items-center mb-3 text-sm text-gray-600">
+                                        <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                        </svg>
+                                        {{ $workshop->pemateri->nama ?? 'Tidak diketahui' }}
+                                    </div>
+
+                                    <div class="flex items-center mb-3 text-sm text-gray-600">
+                                        <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        {{ \Carbon\Carbon::parse($workshop->tanggal)->translatedFormat('d M Y') }}
+                                    </div>
+
+                                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                                        <span class="text-sm font-semibold text-[#057A55]">{{ $workshop->pendaftaran_count }} Pendaftar</span>
+                                        <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Aktif</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        @endforeach
+
+                        {{-- Duplicate untuk efek loop tanpa putus --}}
+                        @foreach($popular_workshops as $workshop)
+                        <a href="{{ route('pengguna.daftar-workshop') }}" class="block w-80 mt-4 mb-4 shrink-0 workshop-card">
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:scale-105 hover:ring-4 hover:ring-[#057A55] hover:ring-opacity-50">
+                                <div class="h-48 bg-gray-200 overflow-hidden">
+                                    @if($workshop->sampul_poster_url)
+                                        <img src="{{ asset('storage/' . $workshop->sampul_poster_url) }}" 
+                                            alt="{{ $workshop->judul }}" 
+                                            class="w-full h-full object-cover transition-transform duration-300 hover:scale-110">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center bg-linier-to-br from-[#057A55] to-[#016545]">
+                                            <svg class="w-16 h-16 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                            </svg>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="p-6">
+                                    <h3 class="text-l font-bold text-gray-900 mb-2 truncate">{{ $workshop->judul }}</h3>
+                                    <div class="flex items-center mb-3 text-sm text-gray-600">
+                                        <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                        </svg>
+                                        {{ $workshop->pemateri->nama ?? 'Tidak diketahui' }}
+                                    </div>
+
+                                    <div class="flex items-center mb-3 text-sm text-gray-600">
+                                        <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        {{ \Carbon\Carbon::parse($workshop->tanggal)->translatedFormat('d M Y') }}
+                                    </div>
+
+                                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                                        <span class="text-sm font-semibold text-[#057A55]">{{ $workshop->pendaftaran_count }} Pendaftar</span>
+                                        <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Aktif</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+                @else
+                <p class="text-center text-gray-500">Tidak ada workshop populer saat ini.</p>
+                @endif
+            </div>
 
     <!-- Recent Activity -->
     <div class="bg-white rounded-lg shadow-md p-6">

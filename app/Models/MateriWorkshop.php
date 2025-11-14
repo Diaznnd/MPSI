@@ -15,10 +15,8 @@ class MateriWorkshop extends Model
 
     protected $fillable = [
         'workshop_id',
-        'pemateri_id',
-        'nama_file',
-        'file_path',
-        'tanggal_upload'
+        'judul_topik',
+        'file_materi_url'
     ];
 
     /**
@@ -27,13 +25,5 @@ class MateriWorkshop extends Model
     public function workshop()
     {
         return $this->belongsTo(Workshop::class, 'workshop_id', 'workshop_id');
-    }
-
-    /**
-     * Relasi ke User (Pemateri)
-     */
-    public function pemateri()
-    {
-        return $this->belongsTo(User::class, 'pemateri_id', 'user_id');
     }
 }

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class MateriController extends Controller
 {
@@ -19,7 +20,7 @@ class MateriController extends Controller
     public function index()
     {
         $pemateriId = Auth::id();
-        
+
         // Get workshops where user is pemateri
         $workshops = Workshop::where('pemateri_id', $pemateriId)
             ->with(['materi'])
@@ -56,8 +57,9 @@ class MateriController extends Controller
             ->where('pemateri_id', $pemateriId)
             ->firstOrFail();
 
-        // Validate file
+        // Validate input
         $request->validate([
+            // judul_topik diabaikan; akan diisi dari judul workshop
             'materi_file' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,zip,rar|max:10240', // Max 10MB
         ], [
             'materi_file.required' => 'File materi wajib diupload',
@@ -67,24 +69,42 @@ class MateriController extends Controller
         ]);
 
         try {
-            // Upload file
-            $file = $request->file('materi_file');
-            $originalName = $file->getClientOriginalName();
-            $fileName = time() . '_' . $originalName;
-            $filePath = $file->storeAs('workshop_materials', $fileName, 'public');
+            return DB::transaction(function() use ($request, $workshop_id, $workshop) {
+                // Upload file
+                $file = $request->file('materi_file');
+                $originalName = $file->getClientOriginalName();
+                $fileName = time() . '_' . $originalName;
+                /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+                $disk = Storage::disk('public');
+                $filePath = $disk->putFileAs('workshop_materials', $file, $fileName);
 
-            // Save to database
-            $materi = MateriWorkshop::create([
-                'workshop_id' => $workshop_id,
-                'pemateri_id' => $pemateriId,
-                'nama_file' => $originalName,
-                'file_path' => $filePath,
-                'tanggal_upload' => Carbon::now(),
-            ]);
+                // Judul materi diambil dari judul workshop
+                $title = $workshop->judul ?? pathinfo($originalName, PATHINFO_FILENAME);
 
-            return redirect()->route('pemateri.materi.index')
-                ->with('success', 'Materi workshop berhasil diupload!');
+                try {
+                    // Save to database
+                    $materi = MateriWorkshop::create([
+                        'workshop_id' => $workshop_id,
+                        'judul_topik' => $title,
+                        'file_materi_url' => $filePath,
+                    ]);
+                } catch (\Throwable $dbEx) {
+                    // Rollback file if DB insert fails
+                    if ($disk->exists($filePath)) {
+                        $disk->delete($filePath);
+                    }
+                    throw $dbEx;
+                }
+
+                return redirect()->route('pemateri.workshop.show', $workshop_id)
+                    ->with('success', 'Materi workshop berhasil diupload!');
+            });
         } catch (\Exception $e) {
+            Log::error('Upload materi gagal', [
+                'workshop_id' => $workshop_id,
+                'user_id' => $pemateriId,
+                'error' => $e->getMessage(),
+            ]);
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Gagal upload materi: ' . $e->getMessage());
@@ -113,13 +133,48 @@ class MateriController extends Controller
             abort(403, 'Anda tidak memiliki akses untuk mengunduh materi ini. Hanya peserta yang terdaftar atau pemateri yang dapat mengunduh materi.');
         }
 
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
         // Check if file exists
-        if (!Storage::disk('public')->exists($materi->file_path)) {
+        if (!$disk->exists($materi->file_materi_url)) {
             abort(404, 'File materi tidak ditemukan.');
         }
 
         // Return file download
-        return Storage::disk('public')->download($materi->file_path, $materi->nama_file);
+        $downloadName = basename($materi->file_materi_url);
+        return $disk->download($materi->file_materi_url, $downloadName);
+    }
+
+    /**
+     * View materi inline (PDF and some formats) with access control.
+     */
+    public function view($materi_id)
+    {
+        $materi = MateriWorkshop::findOrFail($materi_id);
+        $workshop = $materi->workshop;
+
+        $userRegistered = DB::table('pendaftaran')
+            ->where('workshop_id', $workshop->workshop_id)
+            ->where('user_id', Auth::id())
+            ->exists();
+
+        $isPemateri = $workshop->pemateri_id === Auth::id();
+
+        if (!$userRegistered && !$isPemateri) {
+            abort(403, 'Anda tidak memiliki akses untuk melihat materi ini. Hanya peserta yang terdaftar atau pemateri yang dapat melihat materi.');
+        }
+
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
+        if (!$disk->exists($materi->file_materi_url)) {
+            abort(404, 'File materi tidak ditemukan.');
+        }
+
+        $filename = basename($materi->file_materi_url);
+        // Force inline display when possible
+        return $disk->response($materi->file_materi_url, $filename, [
+            'Content-Disposition' => 'inline; filename="' . $filename . '"'
+        ]);
     }
 
     /**
@@ -129,19 +184,26 @@ class MateriController extends Controller
     {
         $pemateriId = Auth::id();
         
+        // Authorize by ensuring the materi belongs to a workshop taught by this pemateri
         $materi = MateriWorkshop::where('materi_id', $materi_id)
-            ->where('pemateri_id', $pemateriId)
+            ->whereHas('workshop', function($q) use ($pemateriId) {
+                $q->where('pemateri_id', $pemateriId);
+            })
             ->firstOrFail();
 
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
         // Delete file from storage
-        if (Storage::disk('public')->exists($materi->file_path)) {
-            Storage::disk('public')->delete($materi->file_path);
+        if ($disk->exists($materi->file_materi_url)) {
+            $disk->delete($materi->file_materi_url);
         }
 
+        // Keep workshop id for redirect before deleting record
+        $workshopId = $materi->workshop_id;
         // Delete from database
         $materi->delete();
 
-        return redirect()->route('pemateri.materi.index')
+        return redirect()->route('pemateri.workshop.show', $workshopId)
             ->with('success', 'Materi berhasil dihapus!');
     }
 }
