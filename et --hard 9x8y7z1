@@ -1,0 +1,11 @@
+[33mcd825b9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{0}: reset: moving to HEAD~1
+[33md6efeb5[m HEAD@{1}: reset: moving to HEAD~1
+[33mfc9f920[m HEAD@{2}: reset: moving to HEAD~1
+[33m443be2d[m HEAD@{3}: commit (merge): Merge branch 'main' of https://github.com/Diaznnd/MPSI
+[33mfc9f920[m HEAD@{4}: commit: update final???
+[33md6efeb5[m HEAD@{5}: pull origin main: Fast-forward
+[33mcd825b9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{6}: pull origin main: Fast-forward
+[33m6aae02a[m HEAD@{7}: commit: update admin
+[33mc81e696[m HEAD@{8}: commit: update modul admin
+[33m75a702f[m HEAD@{9}: Branch: renamed refs/heads/master to refs/heads/main
+[33m75a702f[m HEAD@{11}: commit (initial): First commit - upload project MPSI
