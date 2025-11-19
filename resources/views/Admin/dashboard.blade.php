@@ -44,11 +44,6 @@
             <a href="{{ route('admin.workshop.index') }}" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 relative hover:shadow-lg transition-shadow cursor-pointer">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-medium text-gray-600">Total Workshop</h3>
-                    <button class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-                        </svg>
-                    </button>
                 </div>
                 <div class="mb-2">
                     <p class="text-3xl font-bold text-gray-900">{{ $statistics['workshop_lagi_jalan'] }}</p>
@@ -63,11 +58,6 @@
             <a href="{{ route('admin.workshop.index') }}" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 relative hover:shadow-lg transition-shadow cursor-pointer">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-medium text-gray-600">Workshop Selesai</h3>
-                    <button class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-                        </svg>
-                    </button>
                 </div>
                 <div class="mb-2">
                     <p class="text-3xl font-bold text-gray-900">{{ $statistics['workshop_selesai'] }}</p>
@@ -82,11 +72,6 @@
             <a href="{{ route('admin.workshop.index') }}" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 relative hover:shadow-lg transition-shadow cursor-pointer">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-medium text-gray-600">Workshop Nonaktif</h3>
-                    <button class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-                        </svg>
-                    </button>
                 </div>
                 <div class="mb-2">
                     <p class="text-3xl font-bold text-gray-900">{{ $statistics['workshop_batal'] }}</p>
@@ -101,11 +86,6 @@
             <a href="{{ route('admin.workshop.index') }}" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 relative hover:shadow-lg transition-shadow cursor-pointer">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-medium text-gray-600">Open Pendaftaran</h3>
-                    <button class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-                        </svg>
-                    </button>
                 </div>
                 <div class="mb-2">
                     <p class="text-3xl font-bold text-gray-900">{{ $statistics['workshop_open_pendaftaran'] }}</p>
@@ -126,11 +106,6 @@
             <a href="{{ route('admin.request.index') }}" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 relative hover:shadow-lg transition-shadow cursor-pointer">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-medium text-gray-600">Total Request</h3>
-                    <button class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-                        </svg>
-                    </button>
                 </div>
                 <div class="mb-2">
                     <p class="text-3xl font-bold text-gray-900">{{ $statistics['total_request'] }}</p>
@@ -145,11 +120,6 @@
             <a href="{{ route('admin.account.manage') }}" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 relative hover:shadow-lg transition-shadow cursor-pointer">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-medium text-gray-600">Total Pengguna</h3>
-                    <button class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-                        </svg>
-                    </button>
                 </div>
                 <div class="mb-2">
                     <p class="text-3xl font-bold text-gray-900">{{ $statistics['total_user'] }}</p>
@@ -164,11 +134,6 @@
             <a href="{{ route('admin.account.manage') }}" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 relative hover:shadow-lg transition-shadow cursor-pointer">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-medium text-gray-600">Total Pemateri</h3>
-                    <button class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-                        </svg>
-                    </button>
                 </div>
                 <div class="mb-2">
                     <p class="text-3xl font-bold text-gray-900">{{ $statistics['total_pemateri'] }}</p>
@@ -248,8 +213,8 @@
 
     {{-- Pagination --}}
     <div class="flex justify-between items-center mt-6 space-x-4">
-        <button id="prevMonth" class="bg-gray-200 text-2xl px-1 rounded-2xl font-extrabold text-gray-700 hover:text-gray-900"> ← </button>
-        <button id="nextMonth" class="bg-gray-200 text-2xl px-1 rounded-2xl font-extrabold text-gray-700 hover:text-gray-900"> → </button>
+        <button id="prevMonth" class="bg-gray-200 text-2xl px-1 rounded-2xl font-extrabold text-gray-700 hover:text-gray-900"> ← 
+        <button id="nextMonth" class="bg-gray-200 text-2xl px-1 rounded-2xl font-extrabold text-gray-700 hover:text-gray-900"> → 
     </div>
 </div>
       </div>

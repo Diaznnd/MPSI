@@ -67,7 +67,10 @@
                 </div>
                 
                 <button type="submit" 
-                        class="w-full bg-[#068b4b] hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                        class="w-full text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors"
+                            style="background-color: #068B4B;"
+                            onmouseover="this.style.backgroundColor='#08AA5C';"
+                            onmouseout="this.style.backgroundColor='#068B4B';">
                     Verifikasi dan Lanjutkan
                 </button>
             </form>

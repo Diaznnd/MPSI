@@ -32,11 +32,6 @@
             <div class="bg-white rounded-lg shadow-sm  p-6 relative">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-medium text-gray-600">Total Workshop</h3>
-                    <button class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-                        </svg>
-                    </button>
                 </div>
                 <div class="mb-2">
                     <p class="text-3xl font-bold text-gray-900">{{ $stats['total_workshop']['value'] }}</p>
@@ -53,11 +48,6 @@
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 relative">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-medium text-gray-600">Workshop Aktif</h3>
-                    <button class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-                        </svg>
-                    </button>
                 </div>
                 <div class="mb-2">
                     <p class="text-3xl font-bold text-gray-900">{{ $stats['workshop_aktif']['value'] }}</p>
@@ -74,11 +64,6 @@
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 relative">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-medium text-gray-600">Workshop Nonaktif</h3>
-                    <button class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-                        </svg>
-                    </button>
                 </div>
                 <div class="mb-2">
                     <p class="text-3xl font-bold text-gray-900">{{ $stats['workshop_nonaktif']['value'] }}</p>

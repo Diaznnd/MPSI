@@ -82,7 +82,7 @@
                 <div class="scroll-wrapper">
                     <div class="scroll-loop gap-6 hover-pause-animation">
                         @foreach($popular_workshops as $workshop)
-                        <a href="{{ route('admin.workshop.show', $workshop->workshop_id) }}" class="block w-80 mt-4 mb-4 shrink-0 workshop-card">
+                        <a href="{{ route('workshop.redirect', $workshop->workshop_id) }}" class="block w-80 mt-4 mb-4 shrink-0 workshop-card">
                             <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:scale-105 hover:ring-4 hover:ring-[#057A55] hover:ring-opacity-50">
                                 <div class="h-48 bg-white overflow-hidden">
                                     @if($workshop->sampul_poster_url)
@@ -127,7 +127,7 @@
 
                         {{-- Duplicate untuk efek loop tanpa putus --}}
                         @foreach($popular_workshops as $workshop)
-                        <a href="{{ route('admin.workshop.show', $workshop->workshop_id) }}" class="block w-80 mt-4 mb-4 shrink-0 workshop-card">
+                        <a href="{{ route('workshop.redirect', $workshop->workshop_id) }}" class="block w-80 mt-4 mb-4 shrink-0 workshop-card">
                             <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:scale-105 hover:ring-4 hover:ring-[#057A55] hover:ring-opacity-50">
                                 <div class="h-48 bg-gray-200 overflow-hidden">
                                     @if($workshop->sampul_poster_url)
