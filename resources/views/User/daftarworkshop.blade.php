@@ -9,7 +9,7 @@
 @section('content')
 <div class="w-full">
     <!-- Header Section -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+    <div class="flex col md:flex-row md:items-center md:justify-between mb-6">
         <div class="mb-4 md:mb-0">
             <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Ayo Daftar Sekarang!!!</h1>
         </div>
@@ -35,8 +35,7 @@
     @if($workshops->count() > 0)
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             @foreach($workshops as $workshop)
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer group" 
-                     onclick="showWorkshopDetail({{ $workshop->workshop_id }})">
+                <a href="{{ route('pengguna.workshop.detail', $workshop->workshop_id) }}" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 block group">
                     <!-- Workshop Image -->
                     <div class="relative h-48 bg-gray-200 overflow-hidden">
                         @if($workshop->sampul_poster_url)
@@ -50,7 +49,7 @@
                                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                  onerror="this.onerror=null; this.src='{{ asset('images/perpustakaan.jpg') }}';">
                         @else
-                            <div class="w-full h-full bg-gradient-to-br from-[#057A55] to-[#016545] flex items-center justify-center">
+                            <div class="w-full h-full bg-linier-to-br from-[#057A55] to-[#016545] flex items-center justify-center">
                                 <svg class="w-16 h-16 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
@@ -74,7 +73,7 @@
                     <!-- Workshop Content -->
                     <div class="p-5">
                         <!-- Workshop Title -->
-                        <h3 class="text-lg font-bold text-gray-900 mb-4 line-clamp-2 min-h-[3.5rem]">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4 line-clamp-2 min-h-14">
                             {{ $workshop->judul }}
                         </h3>
 
@@ -83,7 +82,7 @@
                             <!-- Pemateri -->
                             @if($workshop->pemateri)
                                 <div class="flex items-start space-x-2">
-                                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0" style="color: #057A55;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 mt-0.5 shrink-0" style="color: #057A55;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg>
                                     <div class="flex-1">
@@ -97,11 +96,11 @@
                             <!-- Time -->
                             @if($workshop->waktu)
                                 <div class="flex items-start space-x-2">
-                                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0" style="color: #057A55;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 mt-0.5 shrink-0" style="color: #057A55;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                     <p class="text-sm text-gray-600">
-                                        {{ date('H.i', strtotime($workshop->waktu)) }} WIB
+                                        {{ \Carbon\Carbon::parse($workshop->waktu)->setTimezone('Asia/Jakarta')->format('H.i') }} WIB
                                     </p>
                                 </div>
                             @endif
@@ -109,7 +108,7 @@
                             <!-- Date -->
                             @if($workshop->tanggal)
                                 <div class="flex items-start space-x-2">
-                                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0" style="color: #057A55;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 mt-0.5 shrink-0" style="color: #057A55;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
                                     <p class="text-sm text-gray-600">
@@ -121,7 +120,7 @@
                             <!-- Location -->
                             @if($workshop->lokasi)
                                 <div class="flex items-start space-x-2">
-                                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0" style="color: #057A55;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 mt-0.5 shrink-0" style="color: #057A55;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     </svg>
@@ -141,7 +140,7 @@
                             @endif
                         </div>
                     </div>
-                </div>
+                </a>
             @endforeach
         </div>
 
@@ -166,7 +165,6 @@
         </div>
     @endif
 </div>
-
 <!-- Workshop Detail Modal -->
 <div id="workshopModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4" onclick="closeWorkshopModal(event)" style="z-index: 1000;">
     <div class="bg-white rounded-lg max-w-4xl w-full flex flex-col" onclick="event.stopPropagation()" style="max-height: 90vh;">

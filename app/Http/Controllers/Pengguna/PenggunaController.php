@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Workshop;
 use App\Models\Pendaftaran;
 use App\Models\RequestWorkshop;
-use App\Models\Absensi;
 use Illuminate\Http\Request;
+use App\Models\Absensi;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -26,11 +26,19 @@ class PenggunaController extends Controller
             $workshopSaya = Workshop::where('pemateri_id', $user_id)->count();
         }
 
+        $popular_workshops = Workshop::where('status_workshop', 'aktif')
+            ->withCount('pendaftaran')
+            ->with('pemateri')
+            ->orderByDesc('pendaftaran_count')
+            ->limit(3)
+            ->get();
+
+
         // Hitung jumlah pendaftaran user
         $terdaftar = Pendaftaran::where('user_id', $user_id)->count();
 
         // Hitung jumlah request workshop user
-        $request = RequestWorkshop::where('user_id', $user_id)->count();
+        $totalRequest = RequestWorkshop::where('user_id', $user_id)->count();
 
         // Ambil riwayat workshop terbaru (pendaftaran user)
         $riwayatWorkshop = Pendaftaran::with(['workshop.pemateri'])
@@ -39,7 +47,7 @@ class PenggunaController extends Controller
             ->limit(5)
             ->get();
 
-        return view('User.dashboard', compact('workshopSaya', 'terdaftar', 'request', 'riwayatWorkshop'));
+        return view('User.dashboard', compact('workshopSaya', 'terdaftar', 'totalRequest', 'riwayatWorkshop', 'popular_workshops'));
     }
 
     public function myWorkshop(Request $request)
@@ -105,9 +113,7 @@ class PenggunaController extends Controller
                 ->first();
 
             if (!$workshop) {
-                return response()->json([
-                    'error' => 'Workshop tidak ditemukan'
-                ], 404);
+                abort(404);
             }
 
             // Cek apakah user sudah terdaftar (for inactive workshops in My Workshop)
@@ -121,14 +127,10 @@ class PenggunaController extends Controller
 
             // If workshop is inactive, only allow if user is registered
             if ($workshop->status_workshop !== 'aktif' && !$userRegistered) {
-                return response()->json([
-                    'error' => 'Workshop tidak aktif'
-                ], 404);
+                abort(404);
             }
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
+            abort(500, 'Terjadi kesalahan: ' . $e->getMessage());
         }
 
         // Cek apakah kuota sudah penuh
@@ -136,39 +138,118 @@ class PenggunaController extends Controller
         $kuotaMax = $workshop->kuota ?? 0;
         $isFull = $kuotaMax > 0 && $kuotaTerisi >= $kuotaMax;
 
-        // Get keywords
+        // Get keywords list
         $keywords = $workshop->keywords->pluck('keyword')->toArray();
 
-        // Get materi (files)
-        $materi = $workshop->materi->map(function($item) {
-            return [
-                'materi_id' => $item->materi_id,
-                'nama_file' => $item->nama_file,
-                'file_path' => $item->file_path,
-                'tanggal_upload' => $item->tanggal_upload ? Carbon::parse($item->tanggal_upload)->translatedFormat('d F Y') : null
-            ];
-        })->toArray();
+        // Format tanggal dan waktu (WIB)
+        $tanggalFormatted = Carbon::parse($workshop->tanggal)->translatedFormat('l, d F Y');
+        $waktuFormatted = $workshop->waktu
+            ? Carbon::parse($workshop->waktu, 'Asia/Jakarta')->setTimezone('Asia/Jakarta')->format('H.i') . ' WIB'
+            : '-';
 
-        return response()->json([
-            'workshop_id' => $workshop->workshop_id,
-            'judul' => $workshop->judul,
-            'deskripsi' => $workshop->deskripsi,
-            'tanggal' => $workshop->tanggal,
-            'tanggal_formatted' => Carbon::parse($workshop->tanggal)->translatedFormat('l, d F Y'),
-            'waktu' => $workshop->waktu,
-            'waktu_formatted' => $workshop->waktu ? date('H.i', strtotime($workshop->waktu)) . ' WIB' : '-',
-            'lokasi' => $workshop->lokasi,
-            'kuota' => $workshop->kuota,
-            'kuota_terisi' => $kuotaTerisi,
-            'is_full' => $isFull,
-            'sampul_poster_url' => $workshop->sampul_poster_url,
-            'user_registered' => $userRegistered,
+        // Public view for Daftar Workshop
+        return view('User.workshop_detail_public', [
+            'workshop' => $workshop,
             'keywords' => $keywords,
-            'materi' => $materi,
-            'pemateri' => $workshop->pemateri ? [
-                'nama' => $workshop->pemateri->nama,
-                'email' => $workshop->pemateri->email
-            ] : null
+            'kuotaTerisi' => $kuotaTerisi,
+            'kuotaMax' => $kuotaMax,
+            'isFull' => $isFull,
+            'userRegistered' => $userRegistered,
+            'tanggalFormatted' => $tanggalFormatted,
+            'waktuFormatted' => $waktuFormatted,
+        ]);
+    }
+
+    public function myWorkshopDetail($workshop_id)
+    {
+        try {
+            $workshop = Workshop::where('workshop_id', $workshop_id)
+                ->with(['pemateri', 'keywords', 'materi'])
+                ->first();
+
+            if (!$workshop) {
+                abort(404);
+            }
+
+            $userRegistered = false;
+            if (Auth::check()) {
+                $pendaftaran = Pendaftaran::where('workshop_id', $workshop->workshop_id)
+                    ->where('user_id', Auth::id())
+                    ->first();
+                $userRegistered = $pendaftaran !== null;
+            }
+
+            if ($workshop->status_workshop !== 'aktif' && !$userRegistered) {
+                abort(404);
+            }
+        } catch (\Exception $e) {
+            abort(500, 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+
+        $kuotaTerisi = $workshop->kuota_terisi ?? 0;
+        $kuotaMax = $workshop->kuota ?? 0;
+        $isFull = $kuotaMax > 0 && $kuotaTerisi >= $kuotaMax;
+
+        $keywords = $workshop->keywords->pluck('keyword')->toArray();
+        $tanggalFormatted = Carbon::parse($workshop->tanggal)->translatedFormat('l, d F Y');
+        $waktuFormatted = $workshop->waktu
+            ? Carbon::parse($workshop->waktu, 'Asia/Jakarta')->setTimezone('Asia/Jakarta')->format('H.i') . ' WIB'
+            : '-';
+
+        $user_id = Auth::id();
+        $absensi = Absensi::where('workshop_id', $workshop_id)
+            ->where('user_id', $user_id)
+            ->first();
+
+        // Cek ketersediaan absensi (20 menit setelah workshop dimulai)
+        // Set timezone ke Asia/Jakarta (WIB)
+        $workshopDateTime = Carbon::parse($workshop->tanggal . ' ' . $workshop->waktu)->setTimezone('Asia/Jakarta');
+        $now = Carbon::now('Asia/Jakarta');
+        $startTime = $workshopDateTime;
+        $endTime = $workshopDateTime->copy()->addMinutes(20);
+
+        $canTakeAttendance = false;
+        $attendanceMessage = '';
+
+        if ($now < $startTime) {
+            $attendanceMessage = 'Absensi belum tersedia. Workshop dimulai pada ' . $startTime->translatedFormat('d F Y, H:i') . ' WIB';
+        } elseif ($now >= $startTime && $now <= $endTime) {
+            $canTakeAttendance = true;
+            $remainingMinutes = $now->diffInMinutes($endTime, false);
+            $attendanceMessage = $remainingMinutes > 0 
+                ? 'Absensi tersedia. ' 
+                : 'Absensi tersedia. Segera ambil absensi!';
+        } else {
+            $attendanceMessage = 'Waktu absensi telah berakhir. Absensi hanya tersedia selama 20 menit setelah workshop dimulai.';
+        }
+
+        // Cek status absensi user
+        $hasAttended = $absensi !== null;
+        $attendanceStatus = null;
+        if ($hasAttended) {
+            $attendanceStatus = [
+                'waktu_absensi' => Carbon::parse($absensi->waktu_absensi)->setTimezone('Asia/Jakarta')->translatedFormat('d F Y, H:i:s') . ' WIB',
+                'status_absensi' => $absensi->status_absensi
+            ];
+        }
+
+        // Private view for My Workshop (dengan materi & sertifikat)
+        return view('User.workshop_detail', [
+            'workshop' => $workshop,
+            'keywords' => $keywords,
+            'kuotaTerisi' => $kuotaTerisi,
+            'kuotaMax' => $kuotaMax,
+            'isFull' => $isFull,
+            'userRegistered' => $userRegistered,
+            'tanggalFormatted' => $tanggalFormatted,
+            'waktuFormatted' => $waktuFormatted,
+            'absensi' => $absensi,
+            'canTakeAttendance' => $canTakeAttendance,
+            'attendanceMessage' => $attendanceMessage,
+            'hasAttended' => $hasAttended,
+            'attendanceStatus' => $attendanceStatus,
+            'startTime' => $startTime,
+            'endTime' => $endTime,
         ]);
     }
 
@@ -341,80 +422,6 @@ class PenggunaController extends Controller
                 ->withInput()
                 ->with('error', 'Gagal mengirim request workshop: ' . $e->getMessage());
         }
-    }
-
-    public function myWorkshopDetail($workshop_id)
-    {
-        $user_id = Auth::id();
-        
-        // Cek apakah user terdaftar pada workshop ini
-        $pendaftaran = Pendaftaran::where('workshop_id', $workshop_id)
-            ->where('user_id', $user_id)
-            ->first();
-
-        if (!$pendaftaran) {
-            return redirect()->route('pengguna.my-workshop')
-                ->with('error', 'Anda tidak terdaftar pada workshop ini');
-        }
-
-        // Ambil workshop dengan relasi
-        $workshop = Workshop::where('workshop_id', $workshop_id)
-            ->with(['pemateri', 'keywords', 'materi'])
-            ->first();
-
-        if (!$workshop) {
-            return redirect()->route('pengguna.my-workshop')
-                ->with('error', 'Workshop tidak ditemukan');
-        }
-
-        // Cek apakah user sudah absensi
-        $absensi = Absensi::where('workshop_id', $workshop_id)
-            ->where('user_id', $user_id)
-            ->first();
-
-        // Cek ketersediaan absensi (20 menit setelah workshop dimulai)
-        // Set timezone ke Asia/Jakarta (WIB)
-        $workshopDateTime = Carbon::parse($workshop->tanggal . ' ' . $workshop->waktu)->setTimezone('Asia/Jakarta');
-        $now = Carbon::now('Asia/Jakarta');
-        $startTime = $workshopDateTime;
-        $endTime = $workshopDateTime->copy()->addMinutes(20);
-
-        $canTakeAttendance = false;
-        $attendanceMessage = '';
-
-        if ($now < $startTime) {
-            $attendanceMessage = 'Absensi belum tersedia. Workshop dimulai pada ' . $startTime->translatedFormat('d F Y, H:i') . ' WIB';
-        } elseif ($now >= $startTime && $now <= $endTime) {
-            $canTakeAttendance = true;
-            $remainingMinutes = $now->diffInMinutes($endTime, false);
-            $attendanceMessage = $remainingMinutes > 0 
-                ? 'Absensi tersedia. Sisa waktu: ' . $remainingMinutes . ' menit'
-                : 'Absensi tersedia. Segera ambil absensi!';
-        } else {
-            $attendanceMessage = 'Waktu absensi telah berakhir. Absensi hanya tersedia selama 20 menit setelah workshop dimulai.';
-        }
-
-        // Cek status absensi user
-        $hasAttended = $absensi !== null;
-        $attendanceStatus = null;
-        if ($hasAttended) {
-            $attendanceStatus = [
-                'waktu_absensi' => Carbon::parse($absensi->waktu_absensi)->setTimezone('Asia/Jakarta')->translatedFormat('d F Y, H:i:s') . ' WIB',
-                'status_absensi' => $absensi->status_absensi
-            ];
-        }
-
-        return view('User.myworkshopdetail', compact(
-            'workshop', 
-            'pendaftaran', 
-            'absensi',
-            'canTakeAttendance',
-            'attendanceMessage',
-            'hasAttended',
-            'attendanceStatus',
-            'startTime',
-            'endTime'
-        ));
     }
 
     public function checkAttendanceAvailability($workshop_id)

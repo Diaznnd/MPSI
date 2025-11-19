@@ -58,7 +58,7 @@
                             Tanggal: {{ \Carbon\Carbon::parse($workshop->tanggal)->translatedFormat('d F Y') }}
                         @endif
                         @if($workshop->waktu)
-                            | Waktu: {{ date('H.i', strtotime($workshop->waktu)) }} WIB
+                            | Waktu: {{ \Carbon\Carbon::parse($workshop->waktu)->setTimezone('Asia/Jakarta')->format('H.i') }} WIB
                         @endif
                     </p>
                 </div>

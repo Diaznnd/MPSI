@@ -82,15 +82,15 @@
                 <div class="scroll-wrapper">
                     <div class="scroll-loop gap-6 hover-pause-animation">
                         @foreach($popular_workshops as $workshop)
-                        <a href="{{ route('admin.workshop.show', $workshop->workshop_id) }}" class="block w-80 mt-4 mb-4 flex-shrink-0 workshop-card">
+                        <a href="{{ route('admin.workshop.show', $workshop->workshop_id) }}" class="block w-80 mt-4 mb-4 shrink-0 workshop-card">
                             <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:scale-105 hover:ring-4 hover:ring-[#057A55] hover:ring-opacity-50">
-                                <div class="h-48 bg-gray-200 overflow-hidden">
+                                <div class="h-48 bg-white overflow-hidden">
                                     @if($workshop->sampul_poster_url)
                                         <img src="{{ asset('storage/' . $workshop->sampul_poster_url) }}" 
                                             alt="{{ $workshop->judul }}" 
-                                            class="w-full h-full object-cover transition-transform duration-300 hover:scale-110">
+                                            class="w-full h-full object-contain transition-transform duration-300">
                                     @else
-                                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#057A55] to-[#016545]">
+                                        <div class="w-full h-full flex items-center justify-center bg-linier-to-br from-[#057A55] to-[#016545]">
                                             <svg class="w-16 h-16 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
@@ -127,7 +127,7 @@
 
                         {{-- Duplicate untuk efek loop tanpa putus --}}
                         @foreach($popular_workshops as $workshop)
-                        <a href="{{ route('admin.workshop.show', $workshop->workshop_id) }}" class="block w-80 mt-4 mb-4 flex-shrink-0 workshop-card">
+                        <a href="{{ route('admin.workshop.show', $workshop->workshop_id) }}" class="block w-80 mt-4 mb-4 shrink-0 workshop-card">
                             <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:scale-105 hover:ring-4 hover:ring-[#057A55] hover:ring-opacity-50">
                                 <div class="h-48 bg-gray-200 overflow-hidden">
                                     @if($workshop->sampul_poster_url)
@@ -135,7 +135,7 @@
                                             alt="{{ $workshop->judul }}" 
                                             class="w-full h-full object-cover transition-transform duration-300 hover:scale-110">
                                     @else
-                                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#057A55] to-[#016545]">
+                                        <div class="w-full h-full flex items-center justify-center bg-linier-to-br from-[#057A55] to-[#016545]">
                                             <svg class="w-16 h-16 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>

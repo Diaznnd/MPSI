@@ -20,7 +20,7 @@ class AdminController extends Controller
         
         // ===== Statistik Workshop =====
         // Workshop yang lagi jalan (sedang berlangsung): tanggal >= hari ini (akan datang atau sedang berlangsung)
-        $workshop_lagi_jalan = Workshop::where('tanggal', '>=', $today)->count();
+        $workshop_lagi_jalan = Workshop::count();
         
         // Workshop selesai: tanggal < hari ini (sudah lewat tanggalnya)
         $workshop_selesai = Workshop::where('status_workshop', 'selesai')->count();

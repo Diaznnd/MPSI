@@ -152,7 +152,7 @@ class WorkshopController extends Controller
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'tanggal' => 'required|date|after_or_equal:today',
-            'waktu' => ['required', 'regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/'],
+            'waktu' => ['required', 'regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/',],
             'lokasi' => 'required|string|max:255',
             'kuota' => 'required|integer|min:1',
             'kuota_terisi' => 'nullable|integer|min:0',

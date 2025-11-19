@@ -31,8 +31,8 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col text-gray-700 text-sm font-semibold">
         {{ $greeting }} 👋  
         <span class="block text-gray-500 mt-1">
-            <span id="hariTanggal">{{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}</span> — 
-            <span id="jamSekarang">{{ \Carbon\Carbon::now()->format('H:i:s') }}</span>
+            <span id="hariTanggal">{{ \Carbon\Carbon::now('Asia/Jakarta')->translatedFormat('l, d F Y') }}</span> — 
+            <span id="jamSekarang">{{ \Carbon\Carbon::now('Asia/Jakarta')->format('H:i:s') }} WIB</span>
         </span>
     </div>
 
@@ -295,7 +295,7 @@
             <td class="text-center px-6 py-3 truncate">{{ $workshop->pemateri->nama ?? '-' }}</td>
             <td class="text-justify px-6 py-3 truncate">{{ $workshop->lokasi ?? '-' }}</td>
             <td class="text-center px-6 py-3 truncate">{{ \Carbon\Carbon::parse($workshop->tanggal)->format('d M Y') }}</td>
-            <td class="text-center px-6 py-3">{{ $workshop->waktu ?? '-' }}</td>
+            <td class="text-center px-6 py-3">{{ $workshop->waktu ? \Carbon\Carbon::parse($workshop->waktu)->setTimezone('Asia/Jakarta')->format('H.i') . ' WIB' : '-' }}</td>
             <td class="text-center px-4 py-3">
               <span class="px-3 py-1 rounded-full text-xs border {{ $statusColor }}">
                 {{ ucfirst($workshop->status_workshop ?? 'nonaktif') }}
@@ -317,7 +317,7 @@
 <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
   <div class="bg-white shadow-md rounded-xl p-6 m-8">
       <h2 class="text-lg font-semibold mb-4 text-gray-800">
-          Statistik Pelaksanaan Workshop per Bulan ({{ date('Y') }})
+          Statistik Pelaksanaan Workshop per Bulan ({{ \Carbon\Carbon::now('Asia/Jakarta')->format('Y') }})
       </h2>
       <img src="{{ $chartUrl }}" alt="Chart Statistik Workshop" class="w-full rounded-lg shadow">
   </div>

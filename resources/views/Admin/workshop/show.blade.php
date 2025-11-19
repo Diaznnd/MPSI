@@ -50,14 +50,14 @@
             <div class="lg:col-span-2 space-y-6">
 
                 <!-- Cover / Poster -->
-                <div class="bg-gray-100 rounded-lg overflow-hidden relative h-80">
+                <div class="bg-white rounded-lg overflow-hidden relative h-80">
                     @if(!empty($workshop->sampul_poster_url))
                         <img src="{{ asset('storage/' . $workshop->sampul_poster_url) }}" 
                              alt="{{ $workshop->judul ?? 'Poster Workshop' }}" 
-                             class="w-full h-full object-cover">
+                             class="w-full h-full object-contain">
                     @else
                         <img src="https://via.placeholder.com/800x400/e2e8f0/94a3b8?text=Poster+Workshop" 
-                             alt="Workshop" class="w-full h-full object-cover">
+                             alt="Workshop" class="w-full h-full object-contain">
                     @endif
                 </div>
 
@@ -135,11 +135,10 @@
                             <p class="text-gray-900">
                                 @if($workshop->waktu)
                                     @php
-                                        $jamMulai = $workshop->waktu;
-                                        $jamSelesai = $workshop->jam_selesai ?? null;
-                                        $time = $jamSelesai ? "{$jamMulai} – {$jamSelesai}" : $jamMulai;
+                                        $jamMulai = \Carbon\Carbon::parse($workshop->waktu)->setTimezone('Asia/Jakarta')->format('H.i');
+                                        $jamSelesai = $workshop->jam_selesai ? \Carbon\Carbon::parse($workshop->jam_selesai)->setTimezone('Asia/Jakarta')->format('H.i') : null;
                                     @endphp
-                                    {{ $time }}
+                                    {{ $jamSelesai ? ($jamMulai . ' – ' . $jamSelesai . ' WIB') : ($jamMulai . ' WIB') }}
                                 @else
                                     -
                                 @endif

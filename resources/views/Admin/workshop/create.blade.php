@@ -122,7 +122,7 @@
                         <!-- Waktu -->
                         <div>
                             <label for="waktu" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Waktu Workshop
+                                Waktu Workshop (WIB)
                             </label>
                             <input type="time" 
                                    id="waktu" 
