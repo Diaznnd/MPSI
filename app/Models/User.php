@@ -47,4 +47,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ForumDiskusi::class, 'user_id', 'user_id');
     }
+
+    public function absensi()
+    {
+        return $this->hasMany(Absensi::class, 'user_id', 'user_id');
+    }
 }

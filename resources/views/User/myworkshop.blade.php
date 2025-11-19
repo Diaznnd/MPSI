@@ -34,16 +34,15 @@
 
     <!-- Workshop Cards Grid -->
     @if($pendaftarans->count() > 0)
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 items-stretch">
             @foreach($pendaftarans as $pendaftaran)
                 @php
                     $workshop = $pendaftaran->workshop;
                 @endphp
                 @if($workshop)
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer group" 
-                         onclick="showWorkshopDetail({{ $workshop->workshop_id }})">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 group flex flex-col h-full">
                         <!-- Workshop Image -->
-                        <div class="relative h-48 bg-gray-200 overflow-hidden">
+                        <div class="relative h-48 bg-gray-200 overflow-hidden flex-shrink-0">
                             @if($workshop->sampul_poster_url)
                                 @php
                                     $imagePath = str_starts_with($workshop->sampul_poster_url, 'http') 
@@ -68,7 +67,7 @@
                         </div>
                         
                         <!-- Workshop Content -->
-                        <div class="p-4">
+                        <div class="p-4 flex flex-col flex-grow">
                             <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#057A55] transition-colors">
                                 {{ $workshop->judul }}
                             </h3>
@@ -104,9 +103,24 @@
                                 </div>
                             </div>
                             
-                            <p class="text-sm text-gray-600 line-clamp-2 mb-4">
+                            <p class="text-sm text-gray-600 line-clamp-2 mb-4 flex-grow">
                                 {{ $workshop->deskripsi ?: 'Tidak ada deskripsi' }}
                             </p>
+                            
+                            <!-- Button Detail -->
+                            <div class="mt-auto pt-4 border-t border-gray-200">
+                                <a href="{{ route('pengguna.my-workshop.detail', $workshop->workshop_id) }}" 
+                                   class="block w-full text-center px-4 py-2.5 text-white rounded-lg font-medium transition-colors" 
+                                   style="background-color: #057A55;"
+                                   onmouseover="this.style.backgroundColor='#068b4b';" 
+                                   onmouseout="this.style.backgroundColor='#057A55';">
+                                    <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                    Detail
+                                </a>
+                            </div>
                         </div>
                     </div>
                 @endif

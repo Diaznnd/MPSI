@@ -52,6 +52,14 @@ class Workshop extends Model
     }
 
     /**
+     * Relasi ke Absensi
+     */
+    public function absensi()
+    {
+        return $this->hasMany(Absensi::class, 'workshop_id', 'workshop_id');
+    }
+
+    /**
      * Cek apakah kuota sudah penuh
      */
     public function isQuotaFull()

@@ -79,6 +79,14 @@ Route::middleware(['auth', 'pengguna'])->group(function () {
     Route::get('/pengguna/workshop/{workshop_id}/detail', [PenggunaController::class, 'workshopDetail'])->name('pengguna.workshop.detail');
     Route::post('/pengguna/workshop/{workshop_id}/register', [PenggunaController::class, 'registerWorkshop'])->name('pengguna.workshop.register');
     
+    // My Workshop Detail & Attendance
+    Route::get('/pengguna/my-workshop/{workshop_id}/detail', [PenggunaController::class, 'myWorkshopDetail'])->name('pengguna.my-workshop.detail');
+    Route::get('/pengguna/my-workshop/{workshop_id}/check-attendance', [PenggunaController::class, 'checkAttendanceAvailability'])->name('pengguna.attendance.check');
+    Route::post('/pengguna/my-workshop/{workshop_id}/attendance', [PenggunaController::class, 'submitAttendance'])->name('pengguna.attendance.submit');
+    
+    // Certificate Download
+    Route::get('/pengguna/certificate/{workshop_id}/download', [PenggunaController::class, 'downloadCertificate'])->name('pengguna.certificate.download');
+    
     // Forum Diskusi
     Route::get('/pengguna/workshop/{workshop_id}/forum', [\App\Http\Controllers\Pengguna\ForumDiskusiController::class, 'index'])->name('pengguna.forum.index');
     Route::post('/pengguna/workshop/{workshop_id}/forum', [\App\Http\Controllers\Pengguna\ForumDiskusiController::class, 'store'])->name('pengguna.forum.store');
