@@ -658,6 +658,11 @@ class PenggunaController extends Controller
 
     private function generateCertificate($workshop, $user, $absensi)
     {
+        // Ensure GD extension and required image functions are available
+        if (!extension_loaded('gd') || !function_exists('imagecreatefrompng') || !function_exists('imagecreatefromjpeg')) {
+            throw new \Exception('PHP GD extension with PNG/JPEG support is required to generate certificates. Please enable the GD extension and the imagecreatefrom* functions in your PHP installation.');
+        }
+
         $templatePaths = [
             public_path('images/certificate-template.png'),
             public_path('images/certificate-template.jpg'),
