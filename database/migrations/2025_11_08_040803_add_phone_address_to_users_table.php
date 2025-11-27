@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('nomor_telepon', 20)->nullable()->after('email');
-            $table->string('alamat', 255)->nullable()->after('nomor_telepon');
-        });
+        if (Schema::hasTable('users')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('nomor_telepon', 20)->nullable()->after('email');
+                $table->string('alamat', 255)->nullable()->after('nomor_telepon');
+            });
+        }
     }
 
     /**
@@ -22,8 +24,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['nomor_telepon', 'alamat']);
-        });
+        if (Schema::hasTable('users')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->dropColumn(['nomor_telepon', 'alamat']);
+            });
+        }
     }
 };

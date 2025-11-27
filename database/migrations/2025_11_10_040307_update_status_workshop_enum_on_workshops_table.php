@@ -9,13 +9,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Ubah kolom status_workshop menjadi enum baru
-        DB::statement("ALTER TABLE workshops MODIFY status_workshop ENUM('aktif', 'nonaktif', 'penuh', 'selesai') DEFAULT 'aktif'");
+        // Ubah kolom status_workshop menjadi enum baru (hanya untuk MySQL dan jika tabel tersedia)
+        if (DB::getDriverName() === 'mysql' && Schema::hasTable('workshops')) {
+            DB::statement("ALTER TABLE workshops MODIFY status_workshop ENUM('aktif', 'nonaktif', 'penuh', 'selesai') DEFAULT 'aktif'");
+        }
     }
 
     public function down(): void
     {
-        // Kembalikan ke enum semula
-        DB::statement("ALTER TABLE workshops MODIFY status_workshop ENUM('aktif', 'nonaktif') DEFAULT 'aktif'");
+        // Kembalikan ke enum semula (hanya untuk MySQL dan jika tabel tersedia)
+        if (DB::getDriverName() === 'mysql' && Schema::hasTable('workshops')) {
+            DB::statement("ALTER TABLE workshops MODIFY status_workshop ENUM('aktif', 'nonaktif') DEFAULT 'aktif'");
+        }
     }
 };
